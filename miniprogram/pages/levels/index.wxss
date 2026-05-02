@@ -1,93 +1,318 @@
-/* pages/levels/index.wxss · 选关页样式(无 CSS 变量版) */
+/* pages/levels/index.wxss · 选关页 v7.2 真实样式 */
 
 .page {
   min-height: 100vh;
-  padding: 80rpx 40rpx 60rpx;
+  padding: 40rpx 32rpx 200rpx;  /* 底部留出 tab-bar 空间 */
   background-color: #FFE9B8;
+}
+
+/* ============ 顶部标题 ============ */
+.header {
+  text-align: center;
+  margin-bottom: 32rpx;
 }
 
 .title {
   font-size: 56rpx;
   font-weight: 800;
-  text-align: center;
   color: #2C2C2A;
-  margin-bottom: 12rpx;
+  margin-bottom: 8rpx;
 }
 
 .subtitle {
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 600;
-  text-align: center;
   color: #5F5E5A;
-  margin-bottom: 60rpx;
 }
 
+/* ============ 总进度卡 ============ */
+.progress-card {
+  background: #FFFCF2;
+  border: 5rpx solid #2C2C2A;
+  border-radius: 24rpx;
+  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
+  padding: 24rpx 28rpx;
+  margin-bottom: 40rpx;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.progress-label {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #2C2C2A;
+  flex-shrink: 0;
+}
+
+.progress-bar-bg {
+  flex: 1;
+  height: 28rpx;
+  background: #FFE9B8;
+  border-radius: 14rpx;
+  border: 3rpx solid #2C2C2A;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #FF6B47;
+  border-radius: 11rpx;
+  transition: width 0.3s ease-out;
+}
+
+.progress-count {
+  font-size: 28rpx;
+  font-weight: 800;
+  color: #FF6B47;
+  flex-shrink: 0;
+}
+
+/* ============ 错误条 ============ */
 .error-banner {
   background: #FF6B47;
   color: #FFFFFF;
-  padding: 24rpx;
+  padding: 20rpx 24rpx;
   border-radius: 16rpx;
-  font-size: 28rpx;
+  font-size: 26rpx;
   font-weight: 700;
   margin-bottom: 32rpx;
   word-break: break-all;
 }
 
-.status-card {
-  background: #FFF1C9;
-  border: 5rpx solid #2C2C2A;
-  border-radius: 32rpx;
-  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
-  padding: 40rpx 32rpx;
-  margin-bottom: 40rpx;
+/* ============ 幕区段 ============ */
+.act-section {
+  margin-bottom: 36rpx;
 }
 
-.status-text {
+.act-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+  padding: 0 4rpx;
+}
+
+.act-title {
   font-size: 36rpx;
   font-weight: 800;
-  color: #FF6B47;
-  margin-bottom: 24rpx;
-}
-
-.status-meta {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: #5F5E5A;
-  margin-bottom: 8rpx;
-}
-
-.list-card {
-  background: #FFF1C9;
-  border: 5rpx solid #2C2C2A;
-  border-radius: 24rpx;
-  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
-  padding: 32rpx;
-  margin-bottom: 60rpx;
-}
-
-.list-title {
-  font-size: 32rpx;
-  font-weight: 800;
   color: #2C2C2A;
-  margin-bottom: 16rpx;
 }
 
-.list-item {
-  font-size: 28rpx;
+.act-meta {
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.act-meta.--unlocked {
+  color: #FF6B47;
+}
+
+.act-meta.--locked {
+  color: #888780;
+}
+
+/* ============ 关卡卡片网格 · 一行 4 个 ============ */
+.level-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.level-card {
+  /* 一行 4 个,左右总宽 686rpx,gap 12rpx,单卡 (686 - 36) / 4 = 162.5rpx */
+  width: 162rpx;
+  height: 200rpx;
+  background: #FFF1C9;
+  border: 4rpx solid #2C2C2A;
+  border-radius: 20rpx;
+  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
+  padding: 14rpx 10rpx 10rpx;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.level-card.--locked {
+  border-style: dashed;
+  background: #FFFCF2;
+}
+
+.level-card.--playing {
+  background: #2C2C2A;
+}
+
+.level-card:active {
+  transform: translate(2rpx, 2rpx);
+  box-shadow: 2rpx 2rpx 0 0 #2C2C2A;
+}
+
+.level-id {
+  font-size: 36rpx;
+  font-weight: 900;
+  color: #2C2C2A;
+  margin-bottom: 6rpx;
+  line-height: 1;
+}
+
+.level-title {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #2C2C2A;
+  text-align: center;
+  margin-bottom: 4rpx;
+  line-height: 1.2;
+}
+
+.level-tag {
+  font-size: 18rpx;
   font-weight: 600;
   color: #5F5E5A;
-  padding: 8rpx 0;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* 锁定卡 */
+.level-card.--locked .level-id,
+.level-card.--locked .level-title,
+.level-card.--locked .level-tag {
+  color: #888780;
+}
+
+/* 在玩中卡(墨黑底反白) */
+.level-card.--playing .level-id,
+.level-card.--playing .level-title,
+.level-card.--playing .level-tag {
+  color: #FFE9B8;
+}
+
+/* 状态徽章 · 右上角 */
+.badge {
+  position: absolute;
+  top: -10rpx;
+  right: -10rpx;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: #FF6B47;
+  border: 3rpx solid #2C2C2A;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.badge-lock {
+  position: absolute;
+  top: 8rpx;
+  right: 8rpx;
+  font-size: 28rpx;
+}
+
+/* ============ 锁定的幕(整张大占位卡)============ */
+.act-locked-card {
+  background: #FFFCF2;
+  border: 5rpx dashed #2C2C2A;
+  border-radius: 24rpx;
+  padding: 36rpx 28rpx;
+  text-align: center;
+}
+
+.act-locked-icon {
+  font-size: 44rpx;
+  margin-bottom: 12rpx;
+}
+
+.act-locked-text {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #5F5E5A;
+  margin-bottom: 6rpx;
+}
+
+.act-locked-meta {
+  font-size: 22rpx;
+  font-weight: 600;
+  color: #888780;
+  font-style: italic;
+}
+
+/* ============ 调试区 ============ */
+.debug-section {
+  margin-top: 60rpx;
+  padding-top: 24rpx;
+  border-top: 2rpx dashed #888780;
+}
+
+.debug-btn {
+  background: #FFFCF2;
+  border: 3rpx solid #888780;
+  border-radius: 16rpx;
+  padding: 16rpx;
+  text-align: center;
+  font-size: 24rpx;
+  font-weight: 600;
+  color: #5F5E5A;
 }
 
 .test-output {
-  margin-top: 32rpx;
-  padding: 24rpx;
+  margin-top: 16rpx;
+  padding: 16rpx;
   background: #FFFCF2;
-  border: 4rpx solid #2C2C2A;
-  border-radius: 16rpx;
-  font-size: 26rpx;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 12rpx;
+  font-size: 22rpx;
   font-weight: 600;
   color: #5F5E5A;
   white-space: pre-wrap;
   word-break: break-all;
+}
+
+/* ============ 底部 tab 栏(固定底部)============ */
+.tab-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 120rpx;
+  background: #FFFCF2;
+  border-top: 4rpx solid #2C2C2A;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 0 32rpx;
+  padding-bottom: env(safe-area-inset-bottom);  /* iPhone 底部安全区 */
+}
+
+.tab {
+  flex: 1;
+  text-align: center;
+  padding: 12rpx;
+}
+
+.tab-label {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #888780;
+}
+
+.tab-active {
+  background: #FF6B47;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 60rpx;
+  padding: 12rpx 24rpx;
+  flex: 0 0 auto;
+}
+
+.tab-active .tab-label {
+  color: #FFFFFF;
+  font-weight: 800;
 }
