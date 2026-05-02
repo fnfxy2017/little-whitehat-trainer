@@ -3,16 +3,16 @@
 // 主包只放第一幕 8 个关卡,其余幕走分包按需加载
 
 // ============ 主包关卡 · 第一幕(T1-T5 + C1-C3)============
-// 注:小程序运行时 require('.json') 行为不稳,改用 .js 模块包装
+// 小程序 require 用绝对路径(从 miniprogram 根算)更稳,避免 '..' 解析问题
 const mainPackLevels = {
-  T1: require('../levels/T1.js'),
-  T2: require('../levels/T2.js'),
-  T3: require('../levels/T3.js'),
-  T4: require('../levels/T4.js'),
-  T5: require('../levels/T5.js'),
-  C1: require('../levels/C1.js'),
-  C2: require('../levels/C2.js'),
-  C3: require('../levels/C3.js')
+  T1: require('/levels/T1.js'),
+  T2: require('/levels/T2.js'),
+  T3: require('/levels/T3.js'),
+  T4: require('/levels/T4.js'),
+  T5: require('/levels/T5.js'),
+  C1: require('/levels/C1.js'),
+  C2: require('/levels/C2.js'),
+  C3: require('/levels/C3.js')
 };
 
 // ============ 分包关卡映射(act 编号 → 分包名)============

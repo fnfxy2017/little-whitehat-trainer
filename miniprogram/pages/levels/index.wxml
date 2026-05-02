@@ -9,6 +9,7 @@
     <view class="status-text">阶段 1 脚手架完成 ✓</view>
     <view class="status-meta">已加载 {{levelCount}} 个关卡</view>
     <view class="status-meta">已通关 {{cleared}} / {{levelCount}}</view>
+    <view wx:if="{{sampleLevel}}" class="status-meta">{{sampleLevel}}</view>
   </view>
 
   <view class="card list-card">
