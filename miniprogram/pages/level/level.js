@@ -15,7 +15,9 @@ const CARD_ICON = {
   color_red: '🔴', color_yellow: '🟡', color_green: '🟢', color_blue: '🔵',
   take_credential: '🪪', credential_take: '🪪',
   water: '💧', water_drop: '💧',
-  repeat: '🔁', repeat_loop: '🔁'
+  repeat: '🔁', repeat_loop: '🔁',
+  buy: '🛒', buy_milk: '🥛', buy_icecream: '🍦',
+  buy_bread: '🍞', buy_apple: '🍎'
 };
 
 Page({
@@ -103,27 +105,37 @@ Page({
 
   _applyPresetQueue() {
     const ps = this.data.level.presetQueue || [];
-    const queue = ps.map((p, i) => {
-      // preset_queue 的 card 可能不在 cards 列表里(C 系列特征),
-      // 这里能找到就用 card,找不到只显示 label/icon
-      const card = this.data.level.cards.find(c => c.id === p.card_id);
+    const self = this;
+    const queue = ps.map(function (p, i) {
+      const card = self.data.level.cards.find(function (c) { return c.id === p.card_id; });
       const action = card ? card.action : (p.action || 'move');
       const dir = card ? card.dir : p.dir;
       const color = card ? card.color : p.color;
-      const label = card ? card.label : (p.label || p.card_id);
-      const iconText = card ? card.iconText : (CARD_ICON[p.icon] || CARD_ICON[action] || '·');
+      // label 优先用 preset_queue 自带(JSON 已经写好"向右 2 步"等完整文案);
+      // 回退到 card.label,最后是 card_id
+      const label = p.label || (card ? card.label : p.card_id);
+      // icon 优先用 preset_queue 自带(可能是 buy_milk/buy_icecream 等特殊图);
+      // 回退到 card.iconText / action 默认图标
+      const iconText = (p.icon && CARD_ICON[p.icon]) ||
+                       (card ? card.iconText : null) ||
+                       CARD_ICON[action] || '·';
+      // steps 用于实际执行(move 类),不参与 label 显示
       const steps = p.steps || (card && card.stepsInput ? 1 : null);
       return {
         key: 'pre-' + i,
-        cardId: p.card_id,
-        action, dir, color,
-        steps,
-        label: steps && steps > 1 ? `${label} ${steps} 步` : label,
+        cardId: p.card_id || p.id,
+        action: action,
+        dir: dir,
+        color: color,
+        item: p.item || null,    // C1 buy 动作的 item 标识
+        steps: steps,
+        label: label,
         icon: iconText,
-        locked: !!p.locked
+        locked: !!p.locked,
+        malicious: !!p.malicious
       };
     });
-    this.setData({ queue });
+    this.setData({ queue: queue });
   },
 
   // =========================================================================

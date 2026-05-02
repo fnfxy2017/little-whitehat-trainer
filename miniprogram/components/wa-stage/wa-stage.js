@@ -282,6 +282,7 @@ Component({
       });
 
       this._holding = null;
+      this._purchased = {};
       this._stepCount = 0;
     },
 
@@ -373,6 +374,10 @@ Component({
         }
         if (action === 'water') {
           self._executeWater(resolve);
+          return;
+        }
+        if (action === 'buy') {
+          self._executeBuy(card.item || card.sprite, resolve);
           return;
         }
         console.warn('[wa-stage] 未支持的 action:', action);
@@ -571,6 +576,41 @@ Component({
     },
 
     /**
+     * 购买 · C1 用 · 找匹配 sprite 的货架,标记为已购买,记录到 _purchased
+     * 不改变玩家位置;视觉上货架做一次"高亮闪烁"
+     */
+    _executeBuy(itemSprite, resolve) {
+      const self = this;
+      if (!this._purchased) this._purchased = {};
+
+      // 找匹配的 shelf
+      let shelfId = null;
+      const ids = Object.keys(this._shelves || {});
+      for (let i = 0; i < ids.length; i++) {
+        const s = this._shelves[ids[i]];
+        if (s.sprite === itemSprite) { shelfId = ids[i]; break; }
+      }
+      if (!shelfId) {
+        // 找不到对应商品,空转
+        wx.vibrateShort && wx.vibrateShort({ type: 'light' });
+        setTimeout(resolve, 200);
+        return;
+      }
+
+      // 标记购买 + 高亮该货架
+      this._purchased[itemSprite] = true;
+      const shelves = this.data.shelves.map(function (sh) {
+        if (sh.id !== shelfId) return sh;
+        return Object.assign({}, sh, { purchased: true });
+      });
+      this.setData({ shelves: shelves });
+      wx.vibrateShort && wx.vibrateShort({ type: 'medium' });
+
+      // 400ms 后回调(给视觉一点停留)
+      setTimeout(resolve, 400);
+    },
+
+    /**
      * 父级调用,检查通关条件
      */
     isComplete() {
@@ -608,6 +648,23 @@ Component({
         for (let i = 0; i < ids.length; i++) {
           const f = this._flowers[ids[i]];
           if (!f || !f.watered) return false;
+        }
+        return true;
+      }
+
+      if (cond.type === 'execute_safe_queue') {
+        // C1 等:玩家须到达 reach_goal_id 位置 + 没买恶意商品
+        if (!lv.goal) return false;
+        if (this.data.playerX !== lv.goal.x || this.data.playerY !== lv.goal.y) return false;
+        const mustRemove = cond.must_remove_actions || [];
+        const purchased = this._purchased || {};
+        for (let i = 0; i < mustRemove.length; i++) {
+          const act = mustRemove[i];
+          // 形如 'buy:ice_cream' → 拆出 item 名
+          if (act.indexOf('buy:') === 0) {
+            const item = act.slice(4);
+            if (purchased[item]) return false;
+          }
         }
         return true;
       }

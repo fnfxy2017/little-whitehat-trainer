@@ -175,6 +175,26 @@
   border-style: dashed;
   background: #FFE9B8;
 }
+.shelf--purchased {
+  background: #FFE9B8;
+  opacity: 0.55;
+}
+.shelf-badge {
+  position: absolute;
+  top: -8rpx;
+  right: -6rpx;
+  background: #2ECC71;
+  color: #FFFFFF;
+  font-size: 22rpx;
+  font-weight: 900;
+  width: 32rpx;
+  height: 32rpx;
+  border-radius: 50%;
+  border: 3rpx solid #2C2C2A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 .shelf-emoji {
   font-size: 40rpx;
   line-height: 1;
