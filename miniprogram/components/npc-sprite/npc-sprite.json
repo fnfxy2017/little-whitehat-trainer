@@ -2,7 +2,5 @@
   "component": true,
   "renderer": "skyline",
   "componentFramework": "glass-easel",
-  "usingComponents": {
-    "npc-sprite": "/components/npc-sprite/npc-sprite"
-  }
+  "usingComponents": {}
 }

@@ -147,32 +147,10 @@
   white-space: nowrap;
 }
 
-/* ============ 6. NPC ============ */
-.npc {
+/* ============ 6. NPC · 用 npc-sprite 渲染,这里只放定位 ============ */
+.npc-wrap {
   position: absolute;
-  box-sizing: border-box;
-  border: 3rpx solid #2C2C2A;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   z-index: 6;
-  margin: 4rpx;
-  width: calc(100% - 8rpx);
-  height: calc(100% - 8rpx);
-}
-.npc--shuimu,
-.npc--mom { background: #FFC0CB; }
-.npc--durple,
-.npc--brother { background: #D7BDE2; }
-.npc--raddy { background: #FFB6B0; }
-.npc--lime { background: #B6E5B0; }
-.npc--gray { background: #D5D8DC; }
-.npc--guard { background: #FAD7A0; }
-.npc--wizard { background: #C39BD3; }
-.npc--traveler { background: #A9DFBF; }
-.npc-face {
-  font-size: 32rpx;
 }
 
 /* ============ 7. 物品(地上) ============ */

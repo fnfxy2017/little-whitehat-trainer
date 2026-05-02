@@ -53,15 +53,22 @@
     <text wx:if="{{goal.kind === 'door' || goal.kind === 'cred-door'}}" class="goal-exit-arrow">出口</text>
   </view>
 
-  <!-- 6. NPCs -->
+  <!-- 6. NPCs · 标准 NPC 造型(SKILL _STYLE_GUIDE) -->
   <view
     wx:for="{{npcs}}"
     wx:for-item="n"
     wx:key="id"
-    class="npc npc--{{n.type}}"
+    class="npc-wrap"
     style="left: {{n.x * cellSize}}px; top: {{n.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
   >
-    <text class="npc-face">{{n.face}}</text>
+    <npc-sprite
+      size="{{cellSize}}"
+      mainColor="{{n.profile.mainColor}}"
+      accentColor="{{n.profile.accentColor}}"
+      decoration="{{n.profile.decoration}}"
+      mood="{{n.profile.mood}}"
+      showBlush="{{n.profile.showBlush}}"
+    />
   </view>
 
   <!-- 7. 物品(地上)— 凭证特殊样式 -->

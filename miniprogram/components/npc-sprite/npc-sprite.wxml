@@ -1,0 +1,39 @@
+<!-- npc-sprite.wxml · 标准 NPC 造型(SKILL _STYLE_GUIDE 规则)
+     头(圆) + 身体(梯形)+ 困困脸 + 头顶装饰
+     主色 + 装饰色,粗黑描边,纯平涂 -->
+<view class="sprite" style="width: {{size}}px; height: {{size}}px;">
+
+  <!-- 头顶抖动小线(3 条,SKILL wobble 规则) -->
+  <view class="wobble wobble-1" style="background: {{accentColor || mainColor}};"></view>
+  <view class="wobble wobble-2" style="background: {{accentColor || mainColor}};"></view>
+  <view class="wobble wobble-3" style="background: {{accentColor || mainColor}};"></view>
+
+  <!-- 头顶装饰(在头之前画,确保被头压一点) -->
+  <view class="deco deco--{{decoration}}" style="--main: {{mainColor}}; --accent: {{accentColor || mainColor}};">
+    <!-- 各装饰物的具体形状由 CSS 实现,通过 deco--xxx 类切换 -->
+  </view>
+
+  <!-- 头(大圆) -->
+  <view class="head" style="background: {{mainColor}};">
+    <!-- 困困眼(左) -->
+    <view class="eye eye--l">
+      <view class="eyelid"></view>
+      <view class="pupil"></view>
+      <view class="hl"></view>
+    </view>
+    <!-- 困困眼(右) -->
+    <view class="eye eye--r">
+      <view class="eyelid"></view>
+      <view class="pupil"></view>
+      <view class="hl"></view>
+    </view>
+    <!-- 嘴 -->
+    <view class="mouth mouth--{{mood || 'chill'}}"></view>
+    <!-- 腮红(可选) -->
+    <view wx:if="{{showBlush}}" class="blush blush--l"></view>
+    <view wx:if="{{showBlush}}" class="blush blush--r"></view>
+  </view>
+
+  <!-- 身体(梯形)— 用 clip-path 切梯形 -->
+  <view class="body" style="background: {{bodyColor || mainColor}};"></view>
+</view>

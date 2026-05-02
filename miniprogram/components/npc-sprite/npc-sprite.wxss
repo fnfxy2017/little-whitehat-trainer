@@ -1,0 +1,457 @@
+/* npc-sprite.wxss · 严格按 SKILL _STYLE_GUIDE 实现 */
+
+.sprite {
+  position: relative;
+  display: block;
+}
+
+/* ============ 头(圆)============ */
+/* 头占 60% 高度,中央偏上 */
+.head {
+  position: absolute;
+  top: 12%;
+  left: 15%;
+  width: 70%;
+  height: 60%;
+  border: 4rpx solid #2C2C2A;
+  border-radius: 50%;
+  box-sizing: border-box;
+  z-index: 3;
+}
+
+/* ============ 身体(梯形)============ */
+/* 头下面接身体,梯形 — 顶宽 80% / 底宽 100%(SKILL 4:5) */
+.body {
+  position: absolute;
+  bottom: 4%;
+  left: 18%;
+  width: 64%;
+  height: 32%;
+  border: 4rpx solid #2C2C2A;
+  border-radius: 0 0 12rpx 12rpx;
+  box-sizing: border-box;
+  z-index: 2;
+  /* 梯形:顶部窄,底部宽 */
+  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+  -webkit-clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+}
+
+/* ============ 困困眼(SKILL 灵魂)============ */
+.eye {
+  position: absolute;
+  top: 30%;
+  width: 22%;
+  height: 30%;
+  background: #FFFFFF;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.eye--l { left: 18%; }
+.eye--r { right: 18%; }
+
+/* 上眼皮垂下半 — chill / sleepy */
+.eyelid {
+  position: absolute;
+  top: 0; left: -2rpx; right: -2rpx;
+  height: 50%;
+  background: #2C2C2A;
+  border-radius: 50% 50% 0 0 / 100% 100% 0 0;
+}
+
+/* 黑瞳孔 */
+.pupil {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 50%;
+  background: #2C2C2A;
+  border-radius: 50%;
+}
+
+/* 白色高光 */
+.hl {
+  position: absolute;
+  bottom: 30%;
+  right: 18%;
+  width: 18%;
+  height: 18%;
+  background: #FFFFFF;
+  border-radius: 50%;
+}
+
+/* ============ 嘴 ============ */
+.mouth {
+  position: absolute;
+  bottom: 20%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+.mouth--chill {  /* 一字嘴,默认 */
+  width: 14%;
+  height: 4rpx;
+  background: #2C2C2A;
+  border-radius: 2rpx;
+}
+.mouth--smile {  /* 小 ω 弧 */
+  width: 18%;
+  height: 8%;
+  border-bottom: 3rpx solid #2C2C2A;
+  border-radius: 0 0 100% 100% / 0 0 100% 100%;
+}
+.mouth--o {      /* 小 o */
+  width: 10%;
+  height: 14%;
+  background: #2C2C2A;
+  border-radius: 50%;
+}
+
+/* ============ 腮红 ============ */
+.blush {
+  position: absolute;
+  top: 56%;
+  width: 12%;
+  height: 8%;
+  background: #FF6B9D;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+.blush--l { left: 8%; }
+.blush--r { right: 8%; }
+
+/* ============ 抖动小线(SKILL 必须)============ */
+.wobble {
+  position: absolute;
+  border-radius: 50%;
+}
+.wobble-1 {
+  width: 8rpx; height: 8rpx;
+  top: 8%; left: 4%;
+}
+.wobble-2 {
+  width: 6rpx; height: 6rpx;
+  top: 20%; right: 0%;
+}
+.wobble-3 {
+  width: 10rpx; height: 4rpx;
+  top: 40%; right: 6%;
+  border-radius: 4rpx;
+}
+
+/* ============ 头顶装饰 14 款(SKILL 列表)============ */
+.deco {
+  position: absolute;
+  top: -8%;
+  left: 25%;
+  width: 50%;
+  height: 30%;
+  z-index: 4;
+}
+
+/* 兔耳:两只 长椭圆,粉内 */
+.deco--rabbit-ears::before,
+.deco--rabbit-ears::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 22%;
+  height: 100%;
+  background: var(--main);
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.deco--rabbit-ears::before { left: 18%; transform: rotate(-15deg); }
+.deco--rabbit-ears::after { right: 18%; transform: rotate(15deg); }
+
+/* 猫耳:两个三角 */
+.deco--cat-ears::before,
+.deco--cat-ears::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 0; height: 0;
+  border-left: 18rpx solid transparent;
+  border-right: 18rpx solid transparent;
+  border-bottom: 30rpx solid var(--main);
+}
+.deco--cat-ears::before { left: 22%; transform: rotate(-12deg); }
+.deco--cat-ears::after { right: 22%; transform: rotate(12deg); }
+
+/* 熊耳:两个小圆 */
+.deco--bear-ears::before,
+.deco--bear-ears::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  width: 28%;
+  height: 70%;
+  background: var(--main);
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.deco--bear-ears::before { left: 12%; }
+.deco--bear-ears::after { right: 12%; }
+
+/* 尖刺角:两个三角(更陡) */
+.deco--spike-horns::before,
+.deco--spike-horns::after {
+  content: '';
+  position: absolute;
+  bottom: -2rpx;
+  width: 0; height: 0;
+  border-left: 12rpx solid transparent;
+  border-right: 12rpx solid transparent;
+  border-bottom: 40rpx solid var(--accent);
+}
+.deco--spike-horns::before { left: 28%; }
+.deco--spike-horns::after { right: 28%; }
+
+/* 单尖角(瑞迪):一根中央朱砂橙尖 */
+.deco--horn-single {
+  position: absolute;
+  top: 4%;
+  left: 25%;
+  width: 50%;
+  height: 30%;
+}
+.deco--horn-single::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 0;
+  border-left: 16rpx solid transparent;
+  border-right: 16rpx solid transparent;
+  border-bottom: 50rpx solid var(--accent);
+}
+
+/* 尖发(莱姆):3 簇火焰状 */
+.deco--spiky-hair::before,
+.deco--spiky-hair::after,
+.deco--spiky-hair {
+  /* nothing on parent */
+}
+.deco--spiky-hair::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 30%;
+  width: 0; height: 0;
+  border-left: 14rpx solid transparent;
+  border-right: 14rpx solid transparent;
+  border-bottom: 36rpx solid var(--main);
+  transform: rotate(-10deg);
+}
+.deco--spiky-hair::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  right: 30%;
+  width: 0; height: 0;
+  border-left: 14rpx solid transparent;
+  border-right: 14rpx solid transparent;
+  border-bottom: 36rpx solid var(--main);
+  transform: rotate(10deg);
+}
+
+/* 水滴发饰:中央水滴形 */
+.deco--water-drop::before {
+  content: '';
+  position: absolute;
+  bottom: -4rpx;
+  left: 50%;
+  transform: translateX(-50%) rotate(-45deg);
+  width: 28rpx;
+  height: 28rpx;
+  background: var(--accent);
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50% 50% 50% 0;
+  box-sizing: border-box;
+}
+
+/* 树叶头:中央椭圆叶子 */
+.deco--leaves::before {
+  content: '';
+  position: absolute;
+  bottom: -2rpx;
+  left: 30%;
+  width: 40%;
+  height: 100%;
+  background: var(--accent);
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50% 50% 50% 50% / 100% 100% 0 0;
+  box-sizing: border-box;
+}
+.deco--leaves::after {
+  content: '';
+  position: absolute;
+  bottom: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4rpx;
+  height: 30%;
+  background: #2C2C2A;
+}
+
+/* 光头:啥也不画(留白) */
+.deco--bald {
+  visibility: hidden;
+}
+
+/* 桶帽:倒梯形 */
+.deco--bucket-hat::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 18%;
+  width: 64%;
+  height: 100%;
+  background: var(--accent);
+  border: 3rpx solid #2C2C2A;
+  border-radius: 6rpx 6rpx 0 0;
+  clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
+  -webkit-clip-path: polygon(20% 0, 80% 0, 100% 100%, 0 100%);
+}
+
+/* 礼帽(温达):圆筒 + 帽檐 */
+.deco--fedora::before {
+  content: '';
+  position: absolute;
+  bottom: 6rpx;
+  left: 22%;
+  width: 56%;
+  height: 70%;
+  background: var(--accent);
+  border: 3rpx solid #2C2C2A;
+  border-radius: 4rpx;
+  box-sizing: border-box;
+}
+.deco--fedora::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 8%;
+  width: 84%;
+  height: 12%;
+  background: var(--accent);
+  border: 3rpx solid #2C2C2A;
+  border-radius: 6rpx;
+  box-sizing: border-box;
+}
+
+/* 头戴耳机(奥伦):弓形 + 两侧大圆 */
+.deco--headphones::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 18%;
+  width: 64%;
+  height: 70%;
+  border: 6rpx solid #2C2C2A;
+  border-bottom: none;
+  border-radius: 50% 50% 0 0;
+  background: transparent;
+  box-sizing: border-box;
+}
+.deco--headphones::after {
+  content: '';
+  position: absolute;
+  bottom: -4rpx;
+  width: 28rpx;
+  height: 32rpx;
+  background: var(--accent);
+  border: 3rpx solid #2C2C2A;
+  border-radius: 8rpx;
+  box-sizing: border-box;
+  left: 8%;
+}
+
+/* 屏幕脸(电脑先生):整个头是 CRT 显示器外框 */
+.deco--screen {
+  position: absolute;
+  top: 4%;
+  left: 12%;
+  width: 76%;
+  height: 24%;
+  background: var(--accent);
+  border: 4rpx solid #2C2C2A;
+  border-radius: 6rpx 6rpx 0 0;
+  box-sizing: border-box;
+}
+
+/* 水龙头(克拉克):银色水管 */
+.deco--faucet::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 40%;
+  width: 20%;
+  height: 60%;
+  background: #B0B0B0;
+  border: 3rpx solid #2C2C2A;
+  box-sizing: border-box;
+}
+.deco--faucet::after {
+  content: '';
+  position: absolute;
+  bottom: 50%;
+  left: 30%;
+  width: 40%;
+  height: 10rpx;
+  background: #B0B0B0;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 4rpx;
+  box-sizing: border-box;
+}
+
+/* 数字脸(加诺德):蓝屏 + 数字 */
+.deco--digital {
+  position: absolute;
+  top: 8%;
+  left: 18%;
+  width: 64%;
+  height: 22%;
+  background: #1E3A8A;
+  border: 4rpx solid #2C2C2A;
+  border-radius: 4rpx;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: monospace;
+  font-size: 18rpx;
+  color: #00FF66;
+  font-weight: 900;
+}
+
+/* 触手(水母妹妹) — 4 条波浪 — 替换梯形身体 */
+.deco--jelly-tentacles {
+  /* 这个角色比较特殊,通过 wxml 切换 body 形态;
+     此处只占装饰位置(顶部小气泡) */
+  position: absolute;
+  top: 0;
+  left: 30%;
+  width: 40%;
+  height: 16%;
+}
+.deco--jelly-tentacles::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  width: 12rpx;
+  height: 12rpx;
+  background: var(--main);
+  border: 2rpx solid #2C2C2A;
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+/* 触手身体替代版(水母):用作 body 的 wxml override 暂未做,
+   先保留 trapezoid body,水母用 chill 嘴和水滴装饰即可识别 */

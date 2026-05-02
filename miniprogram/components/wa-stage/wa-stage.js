@@ -2,17 +2,11 @@
 // 婉婉舞台 Component · 方案 A:DOM + transform 动画
 // 管理:玩家位置、网格碰撞、execute(card) 走一步、isComplete()
 
+const npcCatalog = require('../../utils/npc-catalog.js');
+
 const FURNITURE_ICONS = {
   bed: '🛏', desk: '🗒', tv: '📺', window: '⊞', lamp: '💡',
   plant: '🌿', table: '🟦', stove: '🍳', other: '·'
-};
-
-const NPC_FACES = {
-  shuimu: 'ʕ•ᴥ•ʔ', mom: 'ʕ•ᴥ•ʔ',
-  durple: '⊙_⊙', brother: '⊙_⊙',
-  raddy: '◕‿◕', lime: '◕‿◕',
-  gray: '=^.^=',  // 灰猫
-  guard: '⊙^⊙', wizard: 'ʘ‿ʘ', traveler: '◑◡◐'
 };
 
 const ITEM_ICONS = {
@@ -146,11 +140,13 @@ Component({
         else furniture.push(item);
       });
 
-      const npcs = (level.npcs || []).map(n => ({
-        id: n.id, type: n.type,
-        x: n.x, y: n.y,
-        face: NPC_FACES[n.type] || '◕_◕'
-      }));
+      const npcs = (level.npcs || []).map(function (n) {
+        return {
+          id: n.id, type: n.type,
+          x: n.x, y: n.y,
+          profile: npcCatalog.getNpcProfile(n.type)
+        };
+      });
 
       // 物品:运行时把 items 拆成"地上 items" + 婉婉手持
       const groundItems = [];
