@@ -87,6 +87,30 @@ function execAtom(state, atom) {
     return { ok: true };
   }
 
+  if (atom.action === 'set_color') {
+    // 找玩家附近(同格 / 4 邻)的可染色实体,把颜色追加进 sequence
+    const px = state.player.x;
+    const py = state.player.y;
+    const cands = [
+      [px, py],
+      [px + 1, py], [px - 1, py],
+      [px, py + 1], [px, py - 1]
+    ];
+    let target = null;
+    for (const [x, y] of cands) {
+      for (const id of Object.keys(state.colorables || {})) {
+        const c = state.colorables[id];
+        if (c.x === x && c.y === y) { target = c; break; }
+      }
+      if (target) break;
+    }
+    if (!target) {
+      return { ok: true, blocked: true, message: '附近没有可染色的东西' };
+    }
+    target.sequence.push(atom.color || 'red');
+    return { ok: true };
+  }
+
   return { ok: false, message: `未知动作: ${atom.action}` };
 }
 
@@ -105,6 +129,16 @@ function checkSuccess(state) {
     if (item.heldBy) return false;
     if (!state.goal) return false;
     return item.x === state.goal.x && item.y === state.goal.y;
+  }
+
+  if (cond.type === 'color_sequence_matches') {
+    const c = state.colorables && state.colorables[cond.entity_id];
+    if (!c) return false;
+    if (c.sequence.length !== c.required.length) return false;
+    for (let i = 0; i < c.required.length; i++) {
+      if (c.sequence[i] !== c.required[i]) return false;
+    }
+    return true;
   }
 
   return false;

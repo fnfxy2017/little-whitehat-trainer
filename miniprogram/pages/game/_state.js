@@ -18,12 +18,25 @@ function createState(levelData) {
     }
   }
 
-  // 收集所有 NPC(非 player、非 goal、非 item),供渲染使用
+  // 收集所有 NPC + 可染色实体(traffic_light 等)
   const npcs = [];
+  const colorables = {};  // id -> { x, y, type, sequence: [], required: [] }
   for (const e of levelData.entities) {
     if (e.id === 'player') continue;
-    if (e.goal) continue;
     if (e.pickupable || e.type === 'item') continue;
+    if (e.type === 'traffic_light') {
+      colorables[e.id] = {
+        id: e.id,
+        type: e.type,
+        x: e.pos[0],
+        y: e.pos[1],
+        required: e.required_sequence || [],
+        sequence: []
+      };
+      // traffic_light 是 goal,不进 npcs
+      continue;
+    }
+    if (e.goal) continue;
     npcs.push({
       id: e.id,
       type: e.type,
@@ -56,6 +69,7 @@ function createState(levelData) {
     // 物品和 NPC 状态
     items,
     npcs,
+    colorables,
 
     // 命令队列
     queue: [],

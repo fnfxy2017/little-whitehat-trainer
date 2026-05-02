@@ -126,9 +126,16 @@ function render(ctx, canvasW, canvasH, state, celebrationT) {
     if (!obj.decorative) drawObject(ctx, obj, offsetX, offsetY, cell);
   }
 
-  // 7. 终点(门 / 目标区)
-  if (state.goal) {
+  // 7. 终点(门 / 目标区 / 信号灯不在这里画,见 7b)
+  if (state.goal && state.goal.type !== 'traffic_light') {
     drawGoal(ctx, state.goal, offsetX, offsetY, cell);
+  }
+
+  // 7b. 可染色实体(信号灯等)
+  if (state.colorables) {
+    for (const id of Object.keys(state.colorables)) {
+      drawColorable(ctx, state.colorables[id], offsetX, offsetY, cell);
+    }
   }
 
   // 8. NPC(妈妈、弟弟等)
@@ -801,6 +808,73 @@ function drawWanwan(ctx, player, offsetX, offsetY, cell, celebrationT) {
 }
 
 module.exports = { render, computeCellSize };
+
+// ===== 可染色实体 — T3 信号灯 =====
+function drawColorable(ctx, c, offsetX, offsetY, cell) {
+  if (c.type !== 'traffic_light') return;
+
+  const cellLeft = offsetX + c.x * cell;
+  const cellTop = offsetY + c.y * cell;
+  const cx = cellLeft + cell / 2;
+  // 信号灯本体:深色长方形(占格子 70% 高、50% 宽)
+  const lampW = cell * 0.55;
+  const lampH = cell * 0.85;
+  const lampX = cx - lampW / 2;
+  const lampY = cellTop + cell * 0.075;
+
+  // 灯杆/底座
+  strokedRoundRect(ctx, lampX, lampY, lampW, lampH, 8, '#3D3D3D', 3);
+
+  // 三个圆灯位:从上到下 红/黄/绿
+  const slotR = cell * 0.10;
+  const slotXs = [cx];
+  const slotYs = [
+    lampY + lampH * 0.22,
+    lampY + lampH * 0.50,
+    lampY + lampH * 0.78
+  ];
+  const colorOrder = ['red', 'yellow', 'green'];
+  const COLOR_HEX = {
+    red:    '#E74C3C',
+    yellow: '#F1C40F',
+    green:  '#27AE60',
+    blue:   '#3498DB'
+  };
+  // sequence 长度决定哪些灯亮了(按 required 顺序依次点亮)
+  const required = c.required || [];
+  const lit = c.sequence || [];
+
+  colorOrder.forEach((color, i) => {
+    const x = slotXs[0];
+    const y = slotYs[i];
+    // 该灯位对应 required[i],如果 lit 已经走到这步且颜色匹配,则点亮
+    const isLit = i < lit.length && lit[i] === required[i];
+    if (isLit) {
+      ctx.fillStyle = COLOR_HEX[color];
+      ctx.beginPath();
+      ctx.arc(x, y, slotR, 0, Math.PI * 2);
+      ctx.fill();
+      // 高光
+      ctx.fillStyle = '#FFFFFF';
+      ctx.globalAlpha = 0.5;
+      ctx.beginPath();
+      ctx.arc(x - slotR * 0.3, y - slotR * 0.3, slotR * 0.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = 1;
+    } else {
+      // 未点亮:深灰
+      ctx.fillStyle = '#5C5C5C';
+      ctx.beginPath();
+      ctx.arc(x, y, slotR, 0, Math.PI * 2);
+      ctx.fill();
+    }
+    ctx.strokeStyle = COLORS.ink;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(x, y, slotR, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+}
 
 // ===== 庆祝撒花瓣 =====
 // 婉婉头顶撒出 8 个朱砂橙小花瓣,放射状飞出 + 重力下落

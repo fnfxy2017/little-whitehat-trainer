@@ -30,6 +30,10 @@ const CMD_ICON = {
   hand_grab:   '📦',  // T2 等关卡的捡起图标
   hand_drop:   '📤',  // T2 等关卡的放下图标
   set_color:   '🎨',
+  color_red:   '🔴',
+  color_yellow:'🟡',
+  color_green: '🟢',
+  color_blue:  '🔵',
   take_credential: '🔑',
   water:       '💧',
   repeat:      '🔁'
@@ -136,14 +140,24 @@ Page({
       const canvas = res[0].node;
       const ctx = canvas.getContext('2d');
 
-      // 用 .map-wrap 容器宽度算 canvas 实际尺寸
-      // T1 grid 10x8,期望地图占用屏宽的 92% 左右
+      // 算地图尺寸
+      // 优先按宽度算,但若计算出的高度超过 viewport 50%,反过来按高度算
       const screenW = sysInfo.screenWidth;
-      const canvasCssW = Math.floor(screenW * 0.88);
+      const screenH = sysInfo.windowHeight || sysInfo.screenHeight;
+      // 地图区最多占屏高 52%,留出顶栏 + 对话/指令/队列/操作 + 安全区
+      const maxMapH = Math.floor(screenH * 0.52);
+      // 地图最大宽度 88%
+      const maxMapW = Math.floor(screenW * 0.88);
 
       const map = this._state.level.map;
       const [gridW, gridH] = map.size;
-      const cellPx = Math.floor(canvasCssW / gridW);
+
+      // 双向约束:cell 取宽度限和高度限的最小值
+      const cellByW = Math.floor(maxMapW / gridW);
+      const cellByH = Math.floor(maxMapH / gridH);
+      const cellPx = Math.min(cellByW, cellByH);
+
+      const canvasCssW = cellPx * gridW;
       const canvasCssH = cellPx * gridH;
 
       canvas.width = canvasCssW * dpr;
@@ -155,9 +169,8 @@ Page({
       this._canvasCssW = canvasCssW;
       this._canvasCssH = canvasCssH;
 
-      // 设置 wxml 中 .map-wrap 的高度,匹配 canvas
-      // canvasCssH 是 px,转 rpx:rpx = px * (750 / screenWidth)
-      const mapHeightRpx = Math.round((canvasCssH + 16) * 750 / sysInfo.screenWidth);
+      // 设置 .map-wrap 高度(canvas + 上下 padding 16px)
+      const mapHeightRpx = Math.round((canvasCssH + 16) * 750 / screenW);
       this.setData({ mapHeight: mapHeightRpx });
 
       this._redraw();
@@ -199,9 +212,10 @@ Page({
     return rawCards.map(c => ({
       id: c.id,
       label: c.label,
-      iconText: CMD_ICON[c.icon] || CMD_ICON[c.action] || '·',  // 降级到 action 图标,再降级到中点
+      iconText: CMD_ICON[c.icon] || CMD_ICON[c.action] || '·',
       action: c.action,
       dir: c.dir,
+      color: c.color,    // T3 set_color 用
       stepsInput: c.steps_input || false,
       defaultSteps: c.default_steps || 1
     }));
@@ -335,6 +349,7 @@ Page({
       cardId: card.id,
       action: card.action,
       dir: card.dir,
+      color: card.color,
       steps,
       label: steps > 1 ? `${card.label} ${steps} 步` : card.label
     };
