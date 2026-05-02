@@ -1,31 +1,25 @@
-<!--pages/levels/index.wxml · 选关页 · v7.2 设计-->
+<!--pages/levels/index.wxml · 选关页 · v7.2 优化版-->
 <view class="page">
 
-  <!-- 顶部标题 -->
   <view class="header">
     <view class="title">白帽小队训练营</view>
     <view class="subtitle">婉婉的冒险 · 七幕完结</view>
   </view>
 
-  <!-- 总进度 -->
   <view class="progress-card">
     <view class="progress-row">
       <view class="progress-label">已通关</view>
       <view class="progress-bar-bg">
         <view class="progress-bar-fill" style="width: {{progressPct}}%"></view>
       </view>
-      <view class="progress-count">{{cleared}} / {{total}}</view>
+      <view class="progress-count {{cleared > 0 ? '--has-progress' : ''}}">{{cleared}} / {{total}}</view>
     </view>
   </view>
 
-  <!-- 错误条 -->
   <view wx:if="{{loadError}}" class="error-banner">⚠ {{loadError}}</view>
 
-  <!-- 7 幕分组 -->
   <block wx:for="{{acts}}" wx:for-item="actGroup" wx:key="act">
     <view class="act-section">
-
-      <!-- 幕标题 -->
       <view class="act-header">
         <view class="act-title">第{{actGroup.label}}幕 · {{actGroup.subtitle}}</view>
         <view class="act-meta {{actGroup.unlocked ? '--unlocked' : '--locked'}}">
@@ -33,7 +27,6 @@
         </view>
       </view>
 
-      <!-- 幕已解锁 → 展示关卡格子 -->
       <view wx:if="{{actGroup.unlocked}}" class="level-grid">
         <view
           wx:for="{{actGroup.levels}}"
@@ -49,24 +42,20 @@
           <view wx:if="{{lv.security}}" class="level-tag">⭐ {{lv.security}}</view>
           <view wx:elif="{{lv.concept}}" class="level-tag">{{lv.concept}}</view>
 
-          <!-- 状态徽章 -->
-          <view wx:if="{{lv.state === 'cleared'}}" class="badge badge-cleared">✓</view>
-          <view wx:elif="{{lv.state === 'playing'}}" class="badge badge-playing">!</view>
+          <view wx:if="{{lv.state === 'cleared'}}" class="badge">✓</view>
+          <view wx:elif="{{lv.state === 'playing'}}" class="playing-flag">在玩</view>
           <view wx:elif="{{lv.state === 'locked'}}" class="badge-lock">🔒</view>
         </view>
       </view>
 
-      <!-- 幕锁定 → 展示一张大占位卡 -->
       <view wx:else class="act-locked-card">
         <view class="act-locked-icon">🔒</view>
         <view class="act-locked-text">{{actGroup.lockReason}}</view>
         <view wx:if="{{actGroup.subpackHint}}" class="act-locked-meta">{{actGroup.subpackHint}}</view>
       </view>
-
     </view>
   </block>
 
-  <!-- 调试区(阶段 1+2 留下的存档自检按钮) -->
   <view class="debug-section">
     <view class="debug-btn" bindtap="onTestStorage">▶ 测试存档(调试)</view>
     <view wx:if="{{lastTestResult}}" class="test-output">{{lastTestResult}}</view>
@@ -74,7 +63,6 @@
 
 </view>
 
-<!-- 底部 tab 栏 -->
 <view class="tab-bar">
   <view class="tab tab-active">
     <view class="tab-label">关卡</view>

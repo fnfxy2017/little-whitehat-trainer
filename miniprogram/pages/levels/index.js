@@ -93,7 +93,7 @@ Page({
         unlocked,
         clearedInAct: stats.count,
         levels: unlocked ? levels : list,
-        lockReason: unlocked ? '' : `通关第${actNum - 1}幕全部 ${actClearedCount[actNum - 1].total} 关后解锁`,
+        lockReason: unlocked ? '' : `第 ${actNum - 1} 幕全通才能解锁`,
         subpackHint: info.subpackHint || ''
       };
     });
