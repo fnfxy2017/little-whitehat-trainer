@@ -68,7 +68,8 @@ Page({
   },
 
   onTapLevel(e) {
-    const { id, state } = e.currentTarget.dataset;
+    const id = e.currentTarget.dataset.id;
+    const state = e.currentTarget.dataset.state;
     if (state === 'locked') {
       wx.showToast({ title: '先通关前面的', icon: 'none', duration: 1200 });
       return;

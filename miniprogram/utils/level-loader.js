@@ -3,7 +3,9 @@
 // main 分支字段:id / map.size / entities[].start_pos / available_command_cards / success_condition / intro_dialog (单数)
 // 内部模型把这些归一化,后续模块都基于内部模型,降低代码与 JSON 字段的耦合
 
-const { LEVELS, ORDER } = require('../data/levels/index.js');
+const levelsModule = require('../data/levels/index.js');
+const LEVELS = levelsModule.LEVELS;
+const ORDER = levelsModule.ORDER;
 
 /**
  * 加载关卡数据。levelId 形如 "T1" / "C1"

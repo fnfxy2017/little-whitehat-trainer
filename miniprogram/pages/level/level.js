@@ -1,5 +1,7 @@
 // pages/level/level.js · 关卡主控制器
-const { loadLevel, listLevelIds } = require('../../utils/level-loader.js');
+const levelLoader = require('../../utils/level-loader.js');
+const loadLevel = levelLoader.loadLevel;
+const listLevelIds = levelLoader.listLevelIds;
 const storage = require('../../utils/storage.js');
 
 const app = getApp();
@@ -187,30 +189,39 @@ Page({
   // =========================================================================
   // 执行队列
   // =========================================================================
-  async onRunQueue() {
+  onRunQueue: function () {
+    var self = this;
     if (this.data.running) return;
     if (this.data.queue.length === 0) {
       wx.showToast({ title: '先放入指令吧', icon: 'none' });
       return;
     }
     this.setData({ running: true, stepCount: 0 });
-    const stage = this.selectComponent('#stage');
+    var stage = this.selectComponent('#stage');
     if (!stage) {
       this.setData({ running: false });
       return;
     }
 
-    for (const cmd of this.data.queue) {
-      try {
-        await stage.execute(cmd, cmd.steps);
-      } catch (e) {
-        console.error('[level] 执行出错:', e);
-        break;
+    var queue = this.data.queue;
+    var i = 0;
+    function runNext() {
+      if (i >= queue.length) {
+        var stepCount = stage.getStepCount();
+        self.setData({ running: false, stepCount: stepCount });
+        self._checkComplete();
+        return;
       }
+      var cmd = queue[i];
+      i++;
+      stage.execute(cmd, cmd.steps).then(runNext, function (err) {
+        console.error('[level] 执行出错:', err);
+        var stepCount = stage.getStepCount();
+        self.setData({ running: false, stepCount: stepCount });
+        self._checkComplete();
+      });
     }
-    const stepCount = stage.getStepCount();
-    this.setData({ running: false, stepCount });
-    this._checkComplete();
+    runNext();
   },
 
   _checkComplete() {

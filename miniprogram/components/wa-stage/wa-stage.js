@@ -78,7 +78,9 @@ Component({
       const lv = this.properties.levelData;
       if (!lv || !lv.map) return;
 
-      const [gridW, gridH] = lv.map.size;
+      const size = lv.map.size;
+      const gridW = size[0];
+      const gridH = size[1];
       const cellByW = Math.floor(maxStageW / gridW);
       const cellByH = Math.floor(maxStageH / gridH);
       const cellSize = Math.min(cellByW, cellByH);
@@ -94,7 +96,9 @@ Component({
     _setupLevel(level) {
       this._initSize();
 
-      const [gridW, gridH] = level.map.size;
+      const size = level.map.size;
+      const gridW = size[0];
+      const gridH = size[1];
       const walls = (level.map.walls || []).map((w, i) => {
         const stripeCount = Math.max(1, Math.floor((w.h * this.data.cellSize) / 24));
         return {
@@ -124,8 +128,11 @@ Component({
       const decoratives = [];
       const furniture = [];
       (level.map.objects || []).forEach((obj, i) => {
-        const [ox, oy] = obj.pos;
-        const [ow, oh] = obj.size || [1, 1];
+        const ox = obj.pos[0];
+        const oy = obj.pos[1];
+        const sz = obj.size || [1, 1];
+        const ow = sz[0];
+        const oh = sz[1];
         const item = {
           key: 'obj-' + i,
           type: obj.type,
@@ -220,11 +227,14 @@ Component({
     _findItemNearPlayer() {
       const px = this.data.playerX, py = this.data.playerY;
       const cands = [[px, py], [px+1, py], [px-1, py], [px, py+1], [px, py-1]];
-      for (const [x, y] of cands) {
-        for (const id of Object.keys(this._items)) {
-          const it = this._items[id];
+      for (let i = 0; i < cands.length; i++) {
+        const x = cands[i][0];
+        const y = cands[i][1];
+        const ids = Object.keys(this._items);
+        for (let j = 0; j < ids.length; j++) {
+          const it = this._items[ids[j]];
           if (it.heldBy) continue;
-          if (it.x === x && it.y === y) return id;
+          if (it.x === x && it.y === y) return ids[j];
         }
       }
       return null;
@@ -236,10 +246,13 @@ Component({
     _findColorableNearPlayer() {
       const px = this.data.playerX, py = this.data.playerY;
       const cands = [[px, py], [px+1, py], [px-1, py], [px, py+1], [px, py-1]];
-      for (const [x, y] of cands) {
-        for (const id of Object.keys(this._colorables)) {
-          const c = this._colorables[id];
-          if (c.x === x && c.y === y) return id;
+      for (let i = 0; i < cands.length; i++) {
+        const x = cands[i][0];
+        const y = cands[i][1];
+        const ids = Object.keys(this._colorables);
+        for (let j = 0; j < ids.length; j++) {
+          const c = this._colorables[ids[j]];
+          if (c.x === x && c.y === y) return ids[j];
         }
       }
       return null;

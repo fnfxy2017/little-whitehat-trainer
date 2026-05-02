@@ -5,10 +5,11 @@
   "appid": "wx4ed9cbc9e1a28c3f",
   "compileType": "miniprogram",
   "libVersion": "3.15.2",
+  "miniprogramRequiredLibVersion": "2.29.2",
   "setting": {
     "urlCheck": true,
-    "es6": true,
-    "enhance": true,
+    "es6": false,
+    "enhance": false,
     "postcss": true,
     "minified": true,
     "newFeature": true,
