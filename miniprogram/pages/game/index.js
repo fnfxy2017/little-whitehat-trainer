@@ -114,6 +114,7 @@ Page({
   onUnload() {
     if (this._hintTimer) clearInterval(this._hintTimer);
     if (this._execTimer) clearTimeout(this._execTimer);
+    if (this._celebrationTimer) clearTimeout(this._celebrationTimer);
   },
 
   // =========================================================================
@@ -163,7 +164,29 @@ Page({
 
   _redraw() {
     if (!this._ctx) return;
-    sceneRender.render(this._ctx, this._canvasCssW, this._canvasCssH, this._state);
+    sceneRender.render(this._ctx, this._canvasCssW, this._canvasCssH, this._state, this._celebrationT || null);
+  },
+
+  /**
+   * 启动 800ms 庆祝动画:婉婉跳起 + 举手 + 撒花瓣
+   * 每帧推进 t,触发 _redraw
+   */
+  _runCelebrationAnimation(durationMs) {
+    const start = Date.now();
+    const tick = () => {
+      const elapsed = Date.now() - start;
+      const t = Math.min(1, elapsed / durationMs);
+      this._celebrationT = t;
+      this._redraw();
+      if (t < 1) {
+        this._celebrationTimer = setTimeout(tick, 16);  // ~60fps
+      } else {
+        // 动画结束,清除标记,做一次"普通站立"重绘
+        this._celebrationT = null;
+        this._redraw();
+      }
+    };
+    tick();
   },
 
   // =========================================================================
@@ -449,8 +472,9 @@ Page({
       console.error('[game] 进度写入失败', e);
     }
 
-    // 1. 先触发庆祝特效(800ms 动画)
+    // 1. 触发庆祝特效:CSS 火花层 + Canvas 婉婉跳起撒花
     this.setData({ showCelebration: true });
+    this._runCelebrationAnimation(800);
 
     // 震动反馈(短促一下)
     try { wx.vibrateShort({ type: 'medium' }); } catch (e) {}

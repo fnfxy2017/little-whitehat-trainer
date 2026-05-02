@@ -56,7 +56,7 @@ function computeCellSize(canvasW, canvasH, gridW, gridH) {
   return Math.floor(Math.min(canvasW / gridW, canvasH / gridH));
 }
 
-function render(ctx, canvasW, canvasH, state) {
+function render(ctx, canvasW, canvasH, state, celebrationT) {
   const map = state.level.map;
   const [gridW, gridH] = map.size;
   const cell = computeCellSize(canvasW, canvasH, gridW, gridH);
@@ -132,7 +132,12 @@ function render(ctx, canvasW, canvasH, state) {
   }
 
   // 8. 婉婉
-  drawWanwan(ctx, state.player, offsetX, offsetY, cell);
+  drawWanwan(ctx, state.player, offsetX, offsetY, cell, celebrationT);
+
+  // 庆祝时:婉婉头顶撒花瓣
+  if (celebrationT != null && celebrationT > 0) {
+    drawCelebrationPetals(ctx, state.player, offsetX, offsetY, cell, celebrationT);
+  }
 
   // 9. 整体外圈描边
   ctx.strokeStyle = COLORS.ink;
@@ -474,27 +479,33 @@ function drawDoor(ctx, goal, offsetX, offsetY, cell) {
 
 // ===== 婉婉(主角,3 头身儿童)=====
 // 严格约束:整体所有元素必须在 cell × 0.92 范围内,不超出格子
-function drawWanwan(ctx, player, offsetX, offsetY, cell) {
+// celebrationT: 0..1 庆祝动画进度,null 时为静止站姿
+function drawWanwan(ctx, player, offsetX, offsetY, cell, celebrationT) {
+  // 庆祝时的"跳起来"位移:用一个抛物线,t=0 在地面,t=0.5 顶点,t=1 落回
+  let jumpOffset = 0;
+  let armRaise = 0;       // 0 = 双手垂下,1 = 双手举到头顶
+  if (celebrationT != null && celebrationT > 0) {
+    // 抛物线 4t(1-t),t=0.5 时为 1
+    jumpOffset = -cell * 0.30 * 4 * celebrationT * (1 - celebrationT);
+    // 手臂从 0 升到 1,在 t=0.3 时达到峰值,然后保持
+    armRaise = Math.min(1, celebrationT * 3);
+  }
+
   // 格子的中心和有效绘图区
   const cellLeft = offsetX + player.x * cell;
-  const cellTop = offsetY + player.y * cell;
+  const cellTop = offsetY + player.y * cell + jumpOffset;
   const cx = cellLeft + cell / 2;
-  // 角色总高占 cell 92%,留 4% padding 上下
   const totalH = cell * 0.92;
-  const top = cellTop + cell * 0.04;          // 头顶 y,严格在格子内
+  const top = cellTop + cell * 0.04;
   const bottom = top + totalH;
-  // 总宽不超过 cell × 0.62(给抖动线留余地)
   const totalW = cell * 0.62;
 
-  // 头大约占总高 38%(3 头身比例)
   const headH = totalH * 0.40;
   const headR = headH * 0.50;
   const headCy = top + headR + headH * 0.05;
-  // 躯干 30%
   const bodyH = totalH * 0.30;
   const bodyTop = headCy + headR * 0.85;
   const bodyW = totalW * 0.70;
-  // 腿 + 鞋 30%
   const legZoneH = bottom - (bodyTop + bodyH);
   const legH = legZoneH * 0.65;
   const shoeH = legZoneH * 0.35;
@@ -535,11 +546,38 @@ function drawWanwan(ctx, player, offsetX, offsetY, cell) {
   // ----- 躯干(白T)-----
   strokedRoundRect(ctx, cx - bodyW / 2, bodyTop, bodyW, bodyH, 5, COLORS.shirt, 2.5);
 
-  // ----- 手臂(肤色),收紧紧贴躯干两侧 -----
+  // ----- 手臂(肤色)-----
+  // 静止时垂在躯干两侧;庆祝时举到头顶两侧(欢呼姿势)
   const armW = bodyW * 0.16;
   const armH = bodyH * 0.65;
-  strokedRoundRect(ctx, cx - bodyW / 2 - armW * 0.5, bodyTop + 2, armW, armH, 3, COLORS.skin, 2);
-  strokedRoundRect(ctx, cx + bodyW / 2 - armW * 0.5, bodyTop + 2, armW, armH, 3, COLORS.skin, 2);
+  if (armRaise > 0) {
+    // 举手姿势:手臂转 60 度斜向上,锚点在肩膀
+    const shoulderLY = bodyTop + 4;
+    const shoulderLX = cx - bodyW / 2 + armW * 0.4;
+    const shoulderRY = bodyTop + 4;
+    const shoulderRX = cx + bodyW / 2 - armW * 0.4;
+    // 手臂末端位置(从肩斜向上)
+    const angle = (1 - armRaise) * 0   // 0 度 = 完全举起
+                + armRaise * (-Math.PI / 3); // -60 度
+    // 实际:armRaise 决定旋转角度,从 90deg(垂下)到 -45deg(斜向上)
+    const fromAngle = Math.PI / 2;     // 垂直向下
+    const toAngle   = -Math.PI / 4;    // 斜向上举
+    const a = fromAngle + (toAngle - fromAngle) * armRaise;
+    // 左臂:相对垂直向下 90 度的镜像,所以另一个 a
+    const aL = Math.PI - a;
+    // 绘制手臂(扁矩形从肩出发)
+    [{ sx: shoulderLX, sy: shoulderLY, ang: aL },
+     { sx: shoulderRX, sy: shoulderRY, ang: a }].forEach(s => {
+      ctx.save();
+      ctx.translate(s.sx, s.sy);
+      ctx.rotate(s.ang - Math.PI / 2);
+      strokedRoundRect(ctx, -armW / 2, 0, armW, armH, 3, COLORS.skin, 2);
+      ctx.restore();
+    });
+  } else {
+    strokedRoundRect(ctx, cx - bodyW / 2 - armW * 0.5, bodyTop + 2, armW, armH, 3, COLORS.skin, 2);
+    strokedRoundRect(ctx, cx + bodyW / 2 - armW * 0.5, bodyTop + 2, armW, armH, 3, COLORS.skin, 2);
+  }
 
   // ----- 头(肤色圆)-----
   strokedCircle(ctx, cx, headCy, headR, COLORS.skin, 2.5);
@@ -623,3 +661,46 @@ function drawWanwan(ctx, player, offsetX, offsetY, cell) {
 }
 
 module.exports = { render, computeCellSize };
+
+// ===== 庆祝撒花瓣 =====
+// 婉婉头顶撒出 8 个朱砂橙小花瓣,放射状飞出 + 重力下落
+function drawCelebrationPetals(ctx, player, offsetX, offsetY, cell, t) {
+  if (t <= 0) return;
+  const cx = offsetX + player.x * cell + cell / 2;
+  // 头顶位置(婉婉在跳起,但花瓣从原始头顶位置起算更稳)
+  const cy0 = offsetY + player.y * cell + cell * 0.20;
+
+  const PETALS = 8;
+  const radius = cell * 0.6;
+  for (let i = 0; i < PETALS; i++) {
+    // 每个花瓣的飞行方向(均匀分布在上半圆)
+    const angle = -Math.PI + (i + 0.5) * (Math.PI / PETALS);
+    // 飞行距离随 t 线性增长
+    const dist = radius * t * 1.4;
+    // 重力:t² 让后期向下加速
+    const gravity = cell * 1.0 * t * t;
+    const px = cx + Math.cos(angle) * dist;
+    const py = cy0 + Math.sin(angle) * dist + gravity;
+    // 大小:从大缩小,但末期不至于消失到看不见
+    const size = cell * 0.10 * (1 - t * 0.4);
+    // 旋转
+    const rot = angle + t * 4;
+    // 透明度:渐隐
+    const alpha = Math.max(0, 1 - Math.pow(t, 1.3));
+
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.translate(px, py);
+    ctx.rotate(rot);
+    // 花瓣:小椭圆,朱砂橙底 + 黑描边
+    ctx.fillStyle = COLORS.action;
+    ctx.strokeStyle = COLORS.ink;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, size, size * 0.55, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.restore();
+  }
+  ctx.globalAlpha = 1;
+}
