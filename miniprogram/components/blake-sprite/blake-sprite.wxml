@@ -1,0 +1,42 @@
+<!-- blake-sprite.wxml · 反派布莱克(SKILL 例外角色)
+     黑色 + 圆顶礼帽 + 西服 + 红领带 + 锐利红瞳 -->
+<view class="blake" style="width: {{size}}px; height: {{size}}px;">
+
+  <!-- 抖动小线:深红 -->
+  <view class="b-wobble b-wobble-1"></view>
+  <view class="b-wobble b-wobble-2"></view>
+  <view class="b-wobble b-wobble-3"></view>
+
+  <!-- 圆顶礼帽 -->
+  <view class="b-hat">
+    <view class="b-hat-crown"></view>
+    <view class="b-hat-band"></view>
+    <view class="b-hat-brim"></view>
+  </view>
+
+  <!-- 头(黑色圆) -->
+  <view class="b-head">
+    <!-- 锐利眼(左)— 无下垂眼皮,红瞳 -->
+    <view class="b-eye b-eye--l">
+      <view class="b-pupil"></view>
+    </view>
+    <view class="b-eye b-eye--r">
+      <view class="b-pupil"></view>
+    </view>
+    <!-- 邪魅微笑曲线 -->
+    <view class="b-mouth"></view>
+  </view>
+
+  <!-- 西服上半身 -->
+  <view class="b-body">
+    <!-- 西服外套(黑) -->
+    <view class="b-jacket"></view>
+    <!-- 白衬衫领口三角 -->
+    <view class="b-shirt"></view>
+    <!-- 红领带 -->
+    <view class="b-tie">
+      <view class="b-tie-knot"></view>
+      <view class="b-tie-blade"></view>
+    </view>
+  </view>
+</view>

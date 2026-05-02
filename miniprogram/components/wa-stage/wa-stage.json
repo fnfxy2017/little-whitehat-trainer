@@ -3,6 +3,7 @@
   "renderer": "skyline",
   "componentFramework": "glass-easel",
   "usingComponents": {
-    "npc-sprite": "/components/npc-sprite/npc-sprite"
+    "npc-sprite": "/components/npc-sprite/npc-sprite",
+    "blake-sprite": "/components/blake-sprite/blake-sprite"
   }
 }

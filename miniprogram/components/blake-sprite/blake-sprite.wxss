@@ -1,0 +1,196 @@
+/* blake-sprite.wxss · 反派布莱克绅士形象
+   黑底 + 礼帽 + 西服 + 红领带 + 红瞳锐利眼
+   完全不遵循 NPC 困困脸规则(SKILL 例外) */
+
+.blake {
+  position: relative;
+  display: block;
+  overflow: visible;
+}
+
+/* ============ 礼帽 ============ */
+.b-hat {
+  position: absolute;
+  top: -4%;
+  left: 18%;
+  width: 64%;
+  height: 30%;
+  z-index: 5;
+}
+
+.b-hat-crown {
+  /* 圆筒帽冠 */
+  position: absolute;
+  bottom: 20%;
+  left: 12%;
+  width: 76%;
+  height: 80%;
+  background: #1A1A1A;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 4rpx 4rpx 0 0;
+  box-sizing: border-box;
+}
+
+.b-hat-band {
+  /* 帽冠红色丝带 */
+  position: absolute;
+  bottom: 22%;
+  left: 12%;
+  width: 76%;
+  height: 16%;
+  background: #B82A1F;
+  border-top: 3rpx solid #2C2C2A;
+  border-bottom: 3rpx solid #2C2C2A;
+  box-sizing: border-box;
+}
+
+.b-hat-brim {
+  /* 帽檐(扁宽) */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 22%;
+  background: #1A1A1A;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50% 50% 6rpx 6rpx / 30% 30% 6rpx 6rpx;
+  box-sizing: border-box;
+}
+
+/* ============ 头 ============ */
+.b-head {
+  position: absolute;
+  top: 22%;
+  left: 20%;
+  width: 60%;
+  height: 50%;
+  background: #1A1A1A;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50%;
+  box-sizing: border-box;
+  z-index: 3;
+}
+
+/* ============ 锐利眼 — 红瞳,无下垂眼皮 ============ */
+.b-eye {
+  position: absolute;
+  top: 28%;
+  width: 26%;
+  height: 18%;
+  background: #FFFFFF;
+  border: 2rpx solid #2C2C2A;
+  /* 锐利:不是圆形,而是斜向椭圆 */
+  border-radius: 50%;
+  box-sizing: border-box;
+  /* 顶部尖一点(像眯眼) */
+  clip-path: polygon(0 50%, 25% 0, 75% 0, 100% 50%, 90% 100%, 10% 100%);
+  -webkit-clip-path: polygon(0 50%, 25% 0, 75% 0, 100% 50%, 90% 100%, 10% 100%);
+}
+.b-eye--l { left: 12%; transform: rotate(-8deg); }
+.b-eye--r { right: 12%; transform: rotate(8deg); }
+
+.b-pupil {
+  position: absolute;
+  top: 25%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 60%;
+  background: #E73C2E;
+  border-radius: 50%;
+}
+
+/* ============ 邪魅微笑 ============ */
+.b-mouth {
+  position: absolute;
+  bottom: 18%;
+  left: 50%;
+  transform: translateX(-50%) rotate(-2deg);
+  width: 26%;
+  height: 6%;
+  border-bottom: 3rpx solid #B82A1F;
+  border-radius: 0 0 100% 100% / 0 0 100% 100%;
+}
+
+/* ============ 西服上半身 ============ */
+.b-body {
+  position: absolute;
+  bottom: 4%;
+  left: 22%;
+  width: 56%;
+  height: 30%;
+  z-index: 2;
+}
+
+.b-jacket {
+  /* 西服外套主体(黑色梯形) */
+  position: absolute;
+  inset: 0;
+  background: #1A1A1A;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 0 0 6rpx 6rpx;
+  box-sizing: border-box;
+  clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%);
+  -webkit-clip-path: polygon(15% 0, 85% 0, 100% 100%, 0 100%);
+}
+
+.b-shirt {
+  /* 白衬衫领口三角 */
+  position: absolute;
+  top: 0;
+  left: 38%;
+  width: 24%;
+  height: 50%;
+  background: #FFFFFF;
+  border: 2rpx solid #2C2C2A;
+  border-top: none;
+  box-sizing: border-box;
+  clip-path: polygon(20% 0, 80% 0, 50% 100%);
+  -webkit-clip-path: polygon(20% 0, 80% 0, 50% 100%);
+}
+
+.b-tie {
+  /* 红领带 */
+  position: absolute;
+  top: 8%;
+  left: 44%;
+  width: 12%;
+  height: 80%;
+}
+
+.b-tie-knot {
+  /* 领结 */
+  position: absolute;
+  top: 0;
+  left: 25%;
+  width: 50%;
+  height: 24%;
+  background: #B82A1F;
+  border: 2rpx solid #2C2C2A;
+  box-sizing: border-box;
+}
+
+.b-tie-blade {
+  /* 领带主体 */
+  position: absolute;
+  top: 24%;
+  left: 0;
+  width: 100%;
+  height: 76%;
+  background: #B82A1F;
+  border: 2rpx solid #2C2C2A;
+  border-top: none;
+  box-sizing: border-box;
+  clip-path: polygon(20% 0, 80% 0, 100% 50%, 50% 100%, 0 50%);
+  -webkit-clip-path: polygon(20% 0, 80% 0, 100% 50%, 50% 100%, 0 50%);
+}
+
+/* ============ 抖动小线 — 深红 ============ */
+.b-wobble {
+  position: absolute;
+  background: #B82A1F;
+  border-radius: 50%;
+}
+.b-wobble-1 { width: 6rpx; height: 6rpx; top: 40%; left: 4%; }
+.b-wobble-2 { width: 4rpx; height: 4rpx; top: 16%; right: 6%; }
+.b-wobble-3 { width: 8rpx; height: 3rpx; top: 60%; right: 4%; border-radius: 4rpx; }

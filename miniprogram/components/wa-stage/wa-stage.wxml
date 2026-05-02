@@ -53,7 +53,7 @@
     <text wx:if="{{goal.kind === 'door' || goal.kind === 'cred-door'}}" class="goal-exit-arrow">出口</text>
   </view>
 
-  <!-- 6. NPCs · 标准 NPC 造型(SKILL _STYLE_GUIDE) -->
+  <!-- 6. NPCs · 标准困困造型 + 布莱克(例外) -->
   <view
     wx:for="{{npcs}}"
     wx:for-item="n"
@@ -61,7 +61,9 @@
     class="npc-wrap"
     style="left: {{n.x * cellSize}}px; top: {{n.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
   >
+    <blake-sprite wx:if="{{n.type === 'blake'}}" size="{{cellSize}}" />
     <npc-sprite
+      wx:else
       size="{{cellSize}}"
       mainColor="{{n.profile.mainColor}}"
       accentColor="{{n.profile.accentColor}}"
