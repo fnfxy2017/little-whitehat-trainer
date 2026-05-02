@@ -137,23 +137,12 @@ Page({
 
     // 容器卡片(repeat)→ 打开重复编辑器
     if (card.isContainer) {
-      // 如果在容器编辑模式中又点了 repeat,忽略(暂不支持嵌套)
-      if (this.data.showRepeatEditor) {
-        wx.showToast({ title: '不能嵌套重复', icon: 'none' });
-        return;
-      }
       this.setData({
         showRepeatEditor: true,
         repeatTimes: 5,
         repeatBody: [],
         repeatEditorCard: card
       });
-      return;
-    }
-
-    // 容器编辑模式中点了普通卡片 → 加进容器
-    if (this.data.showRepeatEditor) {
-      this._addToRepeatBody(card);
       return;
     }
 
@@ -167,6 +156,18 @@ Page({
       return;
     }
     this._pushCard(card, 1);
+  },
+
+  // 重复编辑器内的 mini 卡片栏 — 专用处理器,只做"加进容器"
+  onTapMiniCard(e) {
+    const id = e.currentTarget.dataset.id;
+    const card = this.data.level.cards.find(function (c) { return c.id === id; });
+    if (!card) return;
+    if (card.isContainer) {
+      wx.showToast({ title: '不能嵌套重复', icon: 'none', duration: 1200 });
+      return;
+    }
+    this._addToRepeatBody(card);
   },
 
   // ---- 容器内添加子指令 ----

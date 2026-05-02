@@ -66,8 +66,8 @@
     </view>
   </view>
 
-  <!-- 卡片栏 -->
-  <view wx:if="{{!introVisible && level.cards.length > 0}}" class="card-tray">
+  <!-- 卡片栏 — 编辑器打开时隐藏,避免与编辑器内的 mini 栏冲突 -->
+  <view wx:if="{{!introVisible && level.cards.length > 0 && !showRepeatEditor}}" class="card-tray">
     <view
       wx:for="{{level.cards}}"
       wx:for-item="c"
@@ -112,7 +112,7 @@
           wx:for-item="n"
           wx:key="*this"
           class="times-cell tap-press {{repeatTimes === n ? 'times-cell--active' : ''}}"
-          bindtap="onPickRepeatTimes"
+          catchtap="onPickRepeatTimes"
           data-n="{{n}}"
         >{{n}}</view>
       </view>
@@ -126,7 +126,7 @@
             wx:for-item="rb"
             wx:key="key"
             class="repeat-body-item tap-press"
-            bindtap="onTapRepeatBodyItem"
+            catchtap="onTapRepeatBodyItem"
             data-index="{{index}}"
           >
             <text class="repeat-body-item-icon">{{rb.icon}}</text>
@@ -143,7 +143,7 @@
           wx:for-item="c"
           wx:key="id"
           class="card-mini tap-press {{c.isContainer ? 'card-mini--disabled' : ''}}"
-          bindtap="onTapCard"
+          catchtap="onTapMiniCard"
           data-id="{{c.id}}"
         >
           <text class="card-mini-icon">{{c.iconText}}</text>
@@ -153,8 +153,8 @@
 
       <!-- 4) 操作按钮 -->
       <view class="repeat-editor-actions">
-        <view class="btn btn-secondary tap-press" bindtap="onCancelRepeat">取消</view>
-        <view class="btn btn-primary tap-press" bindtap="onConfirmRepeat">确定</view>
+        <view class="btn btn-secondary tap-press" catchtap="onCancelRepeat">取消</view>
+        <view class="btn btn-primary tap-press" catchtap="onConfirmRepeat">确定</view>
       </view>
     </view>
   </view>
