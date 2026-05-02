@@ -1,0 +1,66 @@
+{
+  "_comment": "关卡 JSON 通用模板。T 系列保留 cards 与 win_condition；C 系列保留 preset_queue 与 security_concept",
+  
+  "level_id": "t1",
+  "series": "T",
+  "title": "方向指令",
+  "order": 1,
+  
+  "intro_dialogs": [
+    { "speaker": "wa", "text": "嗨！我是婉婉" },
+    { "speaker": "wa", "text": "今天教你方向指令" },
+    { "speaker": "system", "text": "拖卡片到下面格子" }
+  ],
+  
+  "manual_tip": "把卡片拖到队列里",
+  
+  "cards": [
+    {
+      "id": "fwd",
+      "type": "direction",
+      "label": "前进",
+      "icon": "/images/cards/fwd.png",
+      "effect": { "dx": 1 }
+    },
+    {
+      "id": "left",
+      "type": "direction",
+      "label": "左转",
+      "icon": "/images/cards/left.png",
+      "effect": { "rotate": -90 }
+    },
+    {
+      "id": "right",
+      "type": "direction",
+      "label": "右转",
+      "icon": "/images/cards/right.png",
+      "effect": { "rotate": 90 }
+    }
+  ],
+  
+  "stage": {
+    "grid": { "cols": 6, "rows": 4 },
+    "wa_start": { "x": 0, "y": 2 },
+    "target": { "x": 5, "y": 2 },
+    "obstacles": []
+  },
+  
+  "win_condition": {
+    "type": "reach_target"
+  },
+  
+  
+  "_c_series_only_below": "下面是 C 系列才用的字段，T 系列删掉",
+  
+  "preset_queue": [
+    { "card_id": "fwd" },
+    { "card_id": "fwd" },
+    { "card_id": "fwd", "locked": true }
+  ],
+  
+  "security_concept": {
+    "name": "指令注入",
+    "real_analogy": "有人偷偷塞纸条进你的待办清单",
+    "defense_tip": "执行前先检查每条指令是不是你自己写的"
+  }
+}

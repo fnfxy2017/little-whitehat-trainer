@@ -1,0 +1,86 @@
+<!-- 关卡页通用模板 - 复制后修改 -->
+<!-- 适用于 T 系列教学关卡和 C 系列概念关卡 -->
+
+<view class="level-page" wx:if="{{level}}">
+  
+  <!-- 关卡顶栏 -->
+  <view class="topbar">
+    <view class="back" bindtap="onBack">‹</view>
+    <view class="title">{{level.title}}</view>
+    <view class="step-counter">步数 {{stepCount}}</view>
+  </view>
+  
+  <!-- 婉婉舞台（方案 A：DOM 实现，方案 B 时改为 canvas type="2d"） -->
+  <view class="stage">
+    <wa-stage 
+      id="stage"
+      grid="{{level.stage.grid}}"
+      wa-start="{{level.stage.wa_start}}"
+      target="{{level.stage.target}}"
+      obstacles="{{level.stage.obstacles}}"
+      bindstep="onStageStep"
+      bindcomplete="onLevelComplete" />
+  </view>
+  
+  <!-- 介绍弹窗（每次进入都重播） -->
+  <intro-dialog 
+    dialogs="{{level.intro_dialogs}}"
+    bindfinish="onIntroFinish" />
+  
+  <!-- 队列槽 -->
+  <view class="queue-area">
+    <queue-display 
+      queue="{{queue}}"
+      bindreorder="onQueueReorder"
+      bindremove="onQueueRemove" />
+  </view>
+  
+  <!-- 卡片栏 / manual_tip 二选一 -->
+  <block wx:if="{{level.cards.length > 0}}">
+    <view class="card-tray">
+      <card-item 
+        wx:for="{{level.cards}}" 
+        wx:key="id"
+        card="{{item}}"
+        used-count="{{inventoryUsed[item.id] || 0}}"
+        bindcard-dropped="onCardDropped" />
+    </view>
+  </block>
+  <block wx:else>
+    <view class="manual-tip">{{level.manual_tip}}</view>
+  </block>
+  
+  <!-- 控制按钮 -->
+  <view class="controls">
+    <view class="btn btn-secondary" bindtap="onClearQueue">清空</view>
+    <view class="btn btn-primary" bindtap="onRunQueue" wx:if="{{!running}}">运行 ▶</view>
+    <view class="btn btn-disabled" wx:if="{{running}}">运行中...</view>
+  </view>
+  
+  <!-- 通关结算（C 系列额外展示 security_concept） -->
+  <view class="result-overlay" wx:if="{{showResult}}">
+    <view class="result-card">
+      <view class="result-title">通关！</view>
+      <view class="result-stats">用了 {{stepCount}} 步</view>
+      
+      <!-- C 系列：展示安全概念 -->
+      <view class="concept-card" wx:if="{{level.security_concept}}">
+        <view class="concept-name">{{level.security_concept.name}}</view>
+        <view class="concept-section">
+          <view class="label">现实里就像</view>
+          <view class="text">{{level.security_concept.real_analogy}}</view>
+        </view>
+        <view class="concept-section">
+          <view class="label">怎么防</view>
+          <view class="text">{{level.security_concept.defense_tip}}</view>
+        </view>
+      </view>
+      
+      <view class="result-actions">
+        <view class="btn btn-secondary" bindtap="onRetry">重玩</view>
+        <view class="btn btn-primary" bindtap="onNext">下一关</view>
+      </view>
+    </view>
+  </view>
+  
+</view>
