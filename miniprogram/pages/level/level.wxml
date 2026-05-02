@@ -1,5 +1,5 @@
 <!-- pages/level/level.wxml · 关卡主页 · DOM 优先 -->
-<view class="level-page" wx:if="{{level}}">
+<view class="level-page" wx:if="{{level}}" style="padding-top: {{statusBarHeight + navBarHeight + 8}}px;">
 
   <!-- 顶栏 -->
   <view class="topbar">

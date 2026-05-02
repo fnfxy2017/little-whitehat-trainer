@@ -19,6 +19,7 @@
     "navigationBarBackgroundColor": "#FFE9B8",
     "navigationBarTitleText": "白帽小队训练营",
     "navigationBarTextStyle": "black",
+    "navigationStyle": "custom",
     "backgroundColor": "#FFE9B8"
   },
   "style": "v2",

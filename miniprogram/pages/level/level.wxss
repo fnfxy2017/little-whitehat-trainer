@@ -13,8 +13,8 @@
 .topbar {
   display: flex;
   align-items: center;
-  gap: 16rpx;
-  padding: 8rpx 4rpx 12rpx;
+  gap: 14rpx;
+  padding: 4rpx 200rpx 12rpx 4rpx;  /* 右边给胶囊按钮留位置 */
 }
 .back-btn {
   background: #FFFCF2;

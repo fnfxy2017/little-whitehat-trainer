@@ -7,7 +7,11 @@
   box-sizing: border-box;
 }
 
-.header { text-align: center; margin-bottom: 28rpx; }
+.header {
+  text-align: center;
+  margin-bottom: 28rpx;
+  padding: 0 200rpx 0 0;  /* 右边给胶囊按钮留位置 */
+}
 .title { font-size: 60rpx; font-weight: 800; color: #2C2C2A; }
 .subtitle { display: block; font-size: 26rpx; font-weight: 600; color: #5F5E5A; margin-top: 6rpx; }
 

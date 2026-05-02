@@ -1,5 +1,5 @@
 <!-- pages/home/home.wxml · 关卡选择页 · v7.2 设计 + Skyline DOM -->
-<scroll-view scroll-y class="page" enhanced bounces>
+<scroll-view scroll-y class="page" enhanced bounces style="padding-top: {{statusBarHeight + navBarHeight + 16}}px;">
   <view class="header">
     <view class="title">白帽小队训练营</view>
     <view class="subtitle">婉婉的冒险 · 七幕完结</view>

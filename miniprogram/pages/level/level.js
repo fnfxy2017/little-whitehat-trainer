@@ -2,6 +2,8 @@
 const { loadLevel, listLevelIds } = require('../../utils/level-loader.js');
 const storage = require('../../utils/storage.js');
 
+const app = getApp();
+
 // 卡片图标映射
 const CARD_ICON = {
   arrow_up: '↑', arrow_down: '↓', arrow_left: '←', arrow_right: '→',
@@ -23,6 +25,10 @@ Page({
     stepCount: 0,
     running: false,
 
+    // 状态栏占位
+    statusBarHeight: 20,
+    navBarHeight: 44,
+
     // 步数选择
     showStepPicker: false,
     stepPickerLabel: '',
@@ -38,6 +44,12 @@ Page({
   },
 
   onLoad(opts) {
+    // 状态栏占位
+    this.setData({
+      statusBarHeight: app.globalData.statusBarHeight || 20,
+      navBarHeight: app.globalData.navBarHeight || 44
+    });
+
     const id = opts.id;
     if (!id) {
       wx.showToast({ title: '关卡 ID 缺失', icon: 'none' });

@@ -2,12 +2,23 @@
 const manifest = require('../../data/manifest.js');
 const storage = require('../../utils/storage.js');
 
+const app = getApp();
+
 Page({
   data: {
     acts: [],
     cleared: 0,
     total: 0,
-    progressPct: 0
+    progressPct: 0,
+    statusBarHeight: 20,
+    navBarHeight: 44
+  },
+
+  onLoad() {
+    this.setData({
+      statusBarHeight: app.globalData.statusBarHeight || 20,
+      navBarHeight: app.globalData.navBarHeight || 44
+    });
   },
 
   onShow() {
