@@ -10,7 +10,9 @@ const FURNITURE_ICONS = {
 const NPC_FACES = {
   shuimu: 'ʕ•ᴥ•ʔ', mom: 'ʕ•ᴥ•ʔ',
   durple: '⊙_⊙', brother: '⊙_⊙',
-  raddy: '◕‿◕', lime: '◕‿◕'
+  raddy: '◕‿◕', lime: '◕‿◕',
+  gray: '=^.^=',  // 灰猫
+  guard: '⊙^⊙', wizard: 'ʘ‿ʘ', traveler: '◑◡◐'
 };
 
 const ITEM_ICONS = {
@@ -45,7 +47,8 @@ Component({
     heldItemIcon: '',
     groundItems: [],
     colorables: [],   // [{ id, x, y, litRed, litYellow, litGreen }]
-    goal: null,       // { kind: 'door' | 'zone', x, y, icon }
+    goal: null,       // { kind: 'door' | 'zone' | 'cred-door', x, y, icon, unlocked }
+    takingItem: null, // { id, fromX, fromY, toX, toY, icon } 取证件飞行动画
 
     celebrating: false
   },
@@ -154,10 +157,17 @@ Component({
       this._items = {};
       for (const id of Object.keys(level.items || {})) {
         const it = level.items[id];
-        this._items[id] = { id, x: it.x, y: it.y, sprite: it.sprite, heldBy: null };
+        this._items[id] = {
+          id, x: it.x, y: it.y, sprite: it.sprite, heldBy: null,
+          type: it.type || 'item',
+          credentialType: it.credentialType || null
+        };
         groundItems.push({
           id,
           x: it.x, y: it.y,
+          sprite: it.sprite,
+          type: it.type || 'item',
+          credentialType: it.credentialType || null,
           icon: ITEM_ICONS[it.sprite] || ITEM_ICONS.item
         });
       }
@@ -190,9 +200,15 @@ Component({
         let icon = '🚪';
         if (level.goal.type === 'door') { kind = 'door'; icon = '🚪'; }
         else if (level.goal.type === 'goal_zone') { kind = 'zone'; icon = '✦'; }
-        else if (level.goal.type === 'traffic_light') { kind = null; }   // 不画 goal,traffic_light 自己画
+        else if (level.goal.type === 'credential_door') { kind = 'cred-door'; icon = '🔒'; }
+        else if (level.goal.type === 'traffic_light') { kind = null; }
         if (kind) {
-          goal = { kind, x: level.goal.x, y: level.goal.y, icon };
+          goal = {
+            kind, icon,
+            x: level.goal.x, y: level.goal.y,
+            requiresCredential: level.goal.requiresCredential || null,
+            unlocked: false
+          };
         }
       }
 
@@ -214,11 +230,20 @@ Component({
     },
 
     /**
-     * 检查格子是否可走 — 只墙挡路,家具不挡
+     * 检查格子是否可走
+     * - 墙永远阻挡
+     * - 家具默认可走
+     * - credential_door:未解锁时阻挡(没拿对应凭证),解锁后通过
      */
     _isWalkable(x, y) {
       if (x < 0 || y < 0 || x >= this._gridW || y >= this._gridH) return false;
-      return !this._wallSet.has(x + ',' + y);
+      if (this._wallSet.has(x + ',' + y)) return false;
+      // 凭证门检查
+      const goal = this.data.goal;
+      if (goal && goal.kind === 'cred-door' && goal.x === x && goal.y === y) {
+        return !!goal.unlocked;
+      }
+      return true;
     },
 
     /**
@@ -263,29 +288,33 @@ Component({
      * 返回 Promise,动画结束后 resolve
      */
     execute(card, stepsOverride) {
-      return new Promise((resolve) => {
+      const self = this;
+      return new Promise(function (resolve) {
         const action = card.action;
         if (action === 'move') {
           const steps = stepsOverride || card.steps || 1;
-          this._executeMove(card.dir, steps, resolve);
+          self._executeMove(card.dir, steps, resolve);
           return;
         }
         if (action === 'pickup') {
-          this._executePickup();
+          self._executePickup();
           setTimeout(resolve, 200);
           return;
         }
         if (action === 'drop') {
-          this._executeDrop();
+          self._executeDrop();
           setTimeout(resolve, 200);
           return;
         }
         if (action === 'set_color') {
-          this._executeSetColor(card.color);
+          self._executeSetColor(card.color);
           setTimeout(resolve, 280);
           return;
         }
-        // 未知动作 — 跳过不报错
+        if (action === 'take_credential') {
+          self._executeTakeCredential(resolve);
+          return;
+        }
         console.warn('[wa-stage] 未支持的 action:', action);
         resolve();
       });
@@ -350,7 +379,75 @@ Component({
         icon: ITEM_ICONS[it.sprite] || ITEM_ICONS.item
       }]);
       this._holding = null;
-      this.setData({ groundItems, heldItemIcon: '' });
+      this.setData({ groundItems: groundItems, heldItemIcon: '' });
+    },
+
+    /**
+     * 取凭证 · 找附近 type=credential 的物品 → 飞行动画 → 拿在手里
+     * 飞行动画通过 takingItem 字段驱动 CSS 动画(物品从原位置缩放飞到婉婉手上)
+     */
+    _executeTakeCredential(resolve) {
+      const self = this;
+      // 找附近的 credential 物品
+      const px = this.data.playerX, py = this.data.playerY;
+      const cands = [[px, py], [px+1, py], [px-1, py], [px, py+1], [px, py-1]];
+      let id = null;
+      for (let i = 0; i < cands.length; i++) {
+        const cx = cands[i][0], cy = cands[i][1];
+        const ids = Object.keys(this._items);
+        for (let j = 0; j < ids.length; j++) {
+          const it = this._items[ids[j]];
+          if (it.heldBy) continue;
+          if (it.type !== 'credential') continue;
+          if (it.x === cx && it.y === cy) { id = ids[j]; break; }
+        }
+        if (id) break;
+      }
+      if (!id) {
+        // 附近没卡,空转
+        wx.vibrateShort && wx.vibrateShort({ type: 'light' });
+        setTimeout(resolve, 200);
+        return;
+      }
+
+      const item = this._items[id];
+      // 触发飞行动画:把物品标记为 taking,渲染层 CSS 飞向婉婉
+      this.setData({
+        takingItem: {
+          id: id,
+          fromX: item.x,
+          fromY: item.y,
+          toX: this.data.playerX,
+          toY: this.data.playerY,
+          icon: ITEM_ICONS[item.sprite] || ITEM_ICONS.item
+        }
+      });
+      // 同时从地面物品列表里移除(此时飞行物在 takingItem 里独立渲染)
+      const groundItems = this.data.groundItems.filter(function (g) { return g.id !== id; });
+      this.setData({ groundItems: groundItems });
+
+      // 600ms 飞行 + 反馈动画结束后,标记 holding
+      setTimeout(function () {
+        item.heldBy = 'player';
+        item.x = self.data.playerX;
+        item.y = self.data.playerY;
+        self._holding = id;
+        // 显示手持图标
+        self.setData({
+          heldItemIcon: ITEM_ICONS[item.sprite] || ITEM_ICONS.item,
+          takingItem: null
+        });
+        // 凭证拿到后,如果地图上有 credential_door 且需求匹配,标记解锁
+        const goal = self.data.goal;
+        if (goal && goal.requiresCredential && goal.requiresCredential === item.credentialType) {
+          self.setData({
+            goal: Object.assign({}, goal, { unlocked: true })
+          });
+        }
+        // 震动反馈
+        wx.vibrateShort && wx.vibrateShort({ type: 'medium' });
+        resolve();
+      }, 600);
     },
 
     _executeSetColor(color) {
@@ -380,6 +477,13 @@ Component({
       if (cond.type === 'reach_goal') {
         if (!lv.goal) return false;
         return this.data.playerX === lv.goal.x && this.data.playerY === lv.goal.y;
+      }
+
+      if (cond.type === 'reach_credential_door') {
+        // 玩家到达 credential_door 位置且门已解锁
+        if (!lv.goal) return false;
+        const atDoor = this.data.playerX === lv.goal.x && this.data.playerY === lv.goal.y;
+        return atDoor && this.data.goal && this.data.goal.unlocked;
       }
       if (cond.type === 'item_at_goal') {
         const item = this._items[cond.item_id];

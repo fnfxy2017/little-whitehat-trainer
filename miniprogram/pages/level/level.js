@@ -13,7 +13,7 @@ const CARD_ICON = {
   hand_drop: '📤', drop: '📤',
   set_color: '🎨',
   color_red: '🔴', color_yellow: '🟡', color_green: '🟢', color_blue: '🔵',
-  take_credential: '🔑',
+  take_credential: '🪪', credential_take: '🪪',
   water: '💧', repeat: '🔁'
 };
 

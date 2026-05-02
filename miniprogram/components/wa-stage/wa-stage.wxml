@@ -41,13 +41,16 @@
     <text class="furniture-icon">{{f.icon}}</text>
   </view>
 
-  <!-- 5. 目标(门 / 目标区) -->
+  <!-- 5. 目标(门 / 目标区 / 凭证门) -->
   <view
     wx:if="{{goal}}"
-    class="goal goal--{{goal.kind}}"
+    class="goal goal--{{goal.kind}} {{goal.unlocked ? 'goal--unlocked' : ''}}"
     style="left: {{goal.x * cellSize}}px; top: {{goal.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
   >
-    <text class="goal-icon">{{goal.icon}}</text>
+    <text class="goal-icon">{{goal.unlocked ? '✓' : goal.icon}}</text>
+    <text wx:if="{{goal.kind === 'cred-door' && !goal.unlocked}}" class="goal-tag">需凭证</text>
+    <text wx:if="{{goal.kind === 'cred-door' && goal.unlocked}}" class="goal-tag goal-tag--ok">已解锁</text>
+    <text wx:if="{{goal.kind === 'door' || goal.kind === 'cred-door'}}" class="goal-exit-arrow">出口</text>
   </view>
 
   <!-- 6. NPCs -->
@@ -61,15 +64,33 @@
     <text class="npc-face">{{n.face}}</text>
   </view>
 
-  <!-- 7. 物品(地上) -->
+  <!-- 7. 物品(地上)— 凭证特殊样式 -->
   <view
     wx:for="{{groundItems}}"
     wx:for-item="it"
     wx:key="id"
-    class="item-on-ground"
+    class="item-on-ground item--{{it.type}} item--{{it.sprite}}"
     style="left: {{it.x * cellSize}}px; top: {{it.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
   >
-    <text class="item-icon">{{it.icon}}</text>
+    <view wx:if="{{it.type === 'credential'}}" class="cred-card">
+      <text class="cred-card-emoji">🪪</text>
+      <text class="cred-card-label">{{it.credentialType === 'library_card' ? '借书卡' : '凭证'}}</text>
+    </view>
+    <text wx:else class="item-icon">{{it.icon}}</text>
+  </view>
+
+  <!-- 7b. 取证件飞行动画(独立渲染层) -->
+  <view
+    wx:if="{{takingItem}}"
+    class="taking-item"
+    style="left: {{takingItem.fromX * cellSize}}px; top: {{takingItem.fromY * cellSize}}px;
+           width: {{cellSize}}px; height: {{cellSize}}px;
+           --tx: {{(takingItem.toX - takingItem.fromX) * cellSize}}px;
+           --ty: {{(takingItem.toY - takingItem.fromY) * cellSize}}px;"
+  >
+    <view class="taking-card">
+      <text class="taking-emoji">{{takingItem.icon}}</text>
+    </view>
   </view>
 
   <!-- 8. 婉婉 -->

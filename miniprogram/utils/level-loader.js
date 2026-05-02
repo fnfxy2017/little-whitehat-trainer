@@ -22,30 +22,30 @@ function listLevelIds() {
 }
 
 function adapt(raw) {
-  // 玩家
   const playerEntity = (raw.entities || []).find(e => e.id === 'player') || {};
-  // 目标(可能是 entity.goal === true,也可能是 success_condition 间接指定)
   const goalEntity = (raw.entities || []).find(e => e.goal === true);
 
-  // 物品(可拾取)
+  // 物品(可拾取):pickupable 标志 / type=item / type=credential
   const items = {};
   for (const e of raw.entities || []) {
-    if (e.pickupable || e.type === 'item') {
+    if (e.pickupable || e.type === 'item' || e.type === 'credential') {
       items[e.id] = {
         id: e.id,
         sprite: e.sprite || e.type || 'item',
+        type: e.type,                                   // 区分 credential 等子类型
+        credentialType: e.credential_type || null,    // 凭证类型(如 'library_card')
         x: e.pos ? e.pos[0] : null,
         y: e.pos ? e.pos[1] : null
       };
     }
   }
 
-  // NPCs(非 player / goal / item / 可染色实体 的所有 entity)
+  // NPCs(非 player / goal / item / 可染色实体)
   const npcs = [];
   const colorables = {};
   for (const e of raw.entities || []) {
     if (e.id === 'player') continue;
-    if (e.pickupable || e.type === 'item') continue;
+    if (e.pickupable || e.type === 'item' || e.type === 'credential') continue;
     if (e.type === 'traffic_light') {
       colorables[e.id] = {
         id: e.id,
@@ -103,9 +103,11 @@ function adapt(raw) {
     colorables,
     goal: goalEntity ? {
       type: goalEntity.type,
+      id: goalEntity.id || 'goal',
       x: goalEntity.pos ? goalEntity.pos[0] : null,
       y: goalEntity.pos ? goalEntity.pos[1] : null,
       requiresItem: goalEntity.requires_item || null,
+      requiresCredential: goalEntity.requires_credential || null,
       requiredSequence: goalEntity.required_sequence || null
     } : null,
     successCondition: raw.success_condition || { type: 'reach_goal' },

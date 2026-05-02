@@ -84,6 +84,7 @@
   box-sizing: border-box;
   border-radius: 12rpx;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 5;
@@ -97,13 +98,53 @@
   border: 4rpx dashed #FF6B47;
   background: rgba(255, 107, 71, 0.18);
 }
-.goal-icon {
-  font-size: 36rpx;
-  color: #FFFFFF;
+.goal--cred-door {
+  background: #5F5E5A;       /* 锁定状态:深灰像金属门 */
+  border: 4rpx solid #2C2C2A;
+  box-shadow: 3rpx 3rpx 0 0 #2C2C2A;
 }
-.goal--zone .goal-icon {
+.goal--cred-door.goal--unlocked {
+  background: #FF6B47;       /* 解锁后变朱砂橙 + 闪烁 */
+  animation: goal-unlock-flash 600ms ease-out;
+}
+@keyframes goal-unlock-flash {
+  0%   { background: #5F5E5A; }
+  40%  { background: #F1C40F; transform: scale(1.06); }
+  100% { background: #FF6B47; transform: scale(1); }
+}
+
+.goal-icon {
+  font-size: 32rpx;
+  color: #FFFFFF;
+  line-height: 1;
+}
+.goal--zone .goal-icon { color: #FF6B47; font-size: 28rpx; }
+.goal--unlocked .goal-icon { color: #FFFFFF; font-size: 38rpx; font-weight: 900; }
+
+.goal-tag {
+  font-size: 16rpx;
+  font-weight: 800;
+  color: #FFE9B8;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 1rpx 6rpx;
+  border-radius: 6rpx;
+  margin-top: 3rpx;
+}
+.goal-tag--ok {
+  color: #FFFFFF;
+  background: rgba(0, 0, 0, 0.5);
+}
+.goal-exit-arrow {
+  position: absolute;
+  bottom: -22rpx;
+  font-size: 16rpx;
+  font-weight: 900;
   color: #FF6B47;
-  font-size: 30rpx;
+  background: #FFFCF2;
+  padding: 1rpx 6rpx;
+  border: 2rpx solid #2C2C2A;
+  border-radius: 4rpx;
+  white-space: nowrap;
 }
 
 /* ============ 6. NPC ============ */
@@ -126,6 +167,10 @@
 .npc--brother { background: #D7BDE2; }
 .npc--raddy { background: #FFB6B0; }
 .npc--lime { background: #B6E5B0; }
+.npc--gray { background: #D5D8DC; }
+.npc--guard { background: #FAD7A0; }
+.npc--wizard { background: #C39BD3; }
+.npc--traveler { background: #A9DFBF; }
 .npc-face {
   font-size: 32rpx;
 }
@@ -148,6 +193,91 @@
   line-height: 54rpx;
   text-align: center;
   box-shadow: 2rpx 2rpx 0 0 #2C2C2A;
+}
+
+/* 凭证道具:贴纸卡片造型 */
+.cred-card {
+  width: 90%;
+  height: 70%;
+  background: #FFFFFF;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 8rpx;
+  box-shadow: 3rpx 3rpx 0 0 #FF6B47, 5rpx 5rpx 0 0 #2C2C2A;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rpx;
+  box-sizing: border-box;
+  position: relative;
+  animation: cred-card-pulse 1.6s ease-in-out infinite;
+}
+/* 卡片左侧那条朱砂橙杠(像 ID 卡的分割线) */
+.cred-card::before {
+  content: '';
+  position: absolute;
+  left: 4rpx;
+  top: 8rpx;
+  bottom: 8rpx;
+  width: 6rpx;
+  background: #FF6B47;
+  border-radius: 3rpx;
+}
+.cred-card-emoji {
+  font-size: 26rpx;
+  line-height: 1;
+}
+.cred-card-label {
+  font-size: 14rpx;
+  font-weight: 800;
+  color: #2C2C2A;
+  margin-top: 2rpx;
+  letter-spacing: 1rpx;
+}
+
+/* 微微浮动,提示这是可交互道具 */
+@keyframes cred-card-pulse {
+  0%, 100% { transform: translateY(0) rotate(-2deg); }
+  50%      { transform: translateY(-3rpx) rotate(2deg); }
+}
+
+/* ============ 7b. 取证件飞行动画 ============ */
+.taking-item {
+  position: absolute;
+  z-index: 12;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: taking-flight 600ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes taking-flight {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+    opacity: 1;
+  }
+  60% {
+    transform: translate(calc(var(--tx) * 0.7), calc(var(--ty) * 0.7 - 60rpx)) scale(1.4) rotate(360deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--tx), var(--ty)) scale(0.5) rotate(720deg);
+    opacity: 0.4;
+  }
+}
+.taking-card {
+  width: 80%;
+  height: 60%;
+  background: #FFFFFF;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 8rpx;
+  box-shadow: 0 6rpx 12rpx rgba(255, 107, 71, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.taking-emoji {
+  font-size: 36rpx;
 }
 
 /* ============ 8. 婉婉 ============ */
