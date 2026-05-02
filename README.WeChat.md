@@ -17,12 +17,12 @@
 
 1. 下载并安装[微信开发者工具(稳定版)](https://developers.weixin.qq.com/miniprogram/dev/devtools/download.html)
 2. 打开工具,选择"小程序" → "导入项目"
-3. 项目目录:**选择 little-whitehat-trainer 仓库根目录**(不是 miniprogram 子目录)
-4. AppID:第一次试用可选"测试号"(无需注册)
+3. **项目目录:选择 `little-whitehat-trainer/miniprogram/` 子目录**(注意不是仓库根)
+4. AppID:第一次试用可选"测试号"(无需注册),或填写自己的真实 AppID
 5. 项目名称:任意填,比如"白帽小队训练营"
 6. 点"导入"
 
-工具会自动读取 `project.config.json`,识别 `miniprogram/` 为根目录。
+> ⚠️ 微信开发者工具要求 `app.json` 必须在导入目录的根。本项目把小程序放在仓库的 `miniprogram/` 子目录里,所以**导入时要明确选择 `miniprogram/` 这个子目录**,工具会从那里识别 `app.json` / `project.config.json` / `sitemap.json`。仓库的其他文件(网页版、文档、SKILL)不会进小程序构建。
 
 ## 此版的运行能力
 
