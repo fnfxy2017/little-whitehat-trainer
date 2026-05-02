@@ -301,7 +301,7 @@ Component({
 
       this._holding = null;
       this._purchased = {};
-      this._eavesdropped = false;  // C3:走入镜子视野则置 true
+      this._eavesdroppedBy = null;  // C3:被哪面镜子监听了(mirror id),null 表示未被监听
       this._stepCount = 0;
     },
 
@@ -442,7 +442,7 @@ Component({
 
     /**
      * 检查玩家当前位置是否进入未碎镜子的视野
-     * 若进入 → 置 _eavesdropped=true + 触发"被监听"视觉反馈
+     * 记录是哪面镜子监听的(便于打碎该镜子后撤销监听)
      */
     _checkMirrorWatch(px, py) {
       const ids = Object.keys(this._mirrors || {});
@@ -452,9 +452,8 @@ Component({
         for (let j = 0; j < m.watchTiles.length; j++) {
           const t = m.watchTiles[j];
           if (t[0] === px && t[1] === py) {
-            if (!this._eavesdropped) {
-              this._eavesdropped = true;
-              // 视觉反馈:对应镜子项加 watching 状态闪一下
+            if (this._eavesdroppedBy !== m.id) {
+              this._eavesdroppedBy = m.id;
               const shelves = this.data.shelves.map(function (sh) {
                 if (sh.id !== m.id) return sh;
                 return Object.assign({}, sh, { watching: true });
@@ -698,6 +697,10 @@ Component({
       }
 
       this._mirrors[id].broken = true;
+      // 如果当前被监听的就是这面镜子,撤销监听
+      if (this._eavesdroppedBy === id) {
+        this._eavesdroppedBy = null;
+      }
       // 视觉:对应 shelf 项加 broken,停掉 watching
       const shelves = this.data.shelves.map(function (sh) {
         if (sh.id !== id) return sh;
@@ -720,8 +723,8 @@ Component({
       if (cond.type === 'reach_goal') {
         if (!lv.goal) return false;
         if (this.data.playerX !== lv.goal.x || this.data.playerY !== lv.goal.y) return false;
-        // C3:被镜子监听过则不算通关
-        if (this._eavesdropped) return false;
+        // C3:被未打碎的镜子监听过则不算通关
+        if (this._eavesdroppedBy) return false;
         return true;
       }
 
