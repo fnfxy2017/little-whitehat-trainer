@@ -1,0 +1,4 @@
+{
+  "desc": "亲友自用,不进微信全网搜索",
+  "rules": [{ "action": "disallow", "page": "*" }]
+}

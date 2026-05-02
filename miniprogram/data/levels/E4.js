@@ -1,0 +1,323 @@
+module.exports = {
+  "id": "E4",
+  "title": "循环的快递员",
+  "act": 5,
+  "chapter": "余烬反扑",
+  "location": "星野站门禁房",
+  "concept_intro": "重放攻击",
+  "security_concept": {
+    "name": "重放攻击",
+    "analogy": "看别人怎么过,一模一样抄一遍。",
+    "defense": "一次性密码 —— 用过就作废。"
+  },
+  "available_commands": [
+    "direction",
+    "credential",
+    "password"
+  ],
+  "intro_dialog": [
+    {
+      "speaker": "小天",
+      "text": "看那个快递员!"
+    },
+    {
+      "speaker": "小天",
+      "text": "他每次都走一样的路。"
+    },
+    {
+      "speaker": "小天",
+      "text": "看好他怎么做的。"
+    },
+    {
+      "speaker": "小天",
+      "text": "我们照着做一遍。"
+    }
+  ],
+  "map": {
+    "size": [
+      10,
+      7
+    ],
+    "tileset": "street",
+    "walls": [
+      {
+        "x": 0,
+        "y": 0,
+        "w": 10,
+        "h": 1
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "w": 10,
+        "h": 1
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 7
+      },
+      {
+        "x": 9,
+        "y": 0,
+        "w": 1,
+        "h": 7
+      }
+    ],
+    "objects": [
+      {
+        "type": "tree",
+        "pos": [
+          1,
+          1
+        ],
+        "size": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "tree",
+        "pos": [
+          8,
+          5
+        ],
+        "size": [
+          1,
+          1
+        ]
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "player",
+      "type": "wanwan",
+      "start_pos": [
+        1,
+        3
+      ],
+      "facing": "right",
+      "tier": 2
+    },
+    {
+      "id": "red_gift",
+      "type": "credential",
+      "pos": [
+        3,
+        2
+      ],
+      "sprite": "red_gift_box",
+      "credential_type": "red_key"
+    },
+    {
+      "id": "yellow_gift",
+      "type": "credential",
+      "pos": [
+        3,
+        3
+      ],
+      "sprite": "yellow_gift_box",
+      "credential_type": "yellow_key"
+    },
+    {
+      "id": "blue_gift",
+      "type": "credential",
+      "pos": [
+        3,
+        4
+      ],
+      "sprite": "blue_gift_box",
+      "credential_type": "blue_key"
+    },
+    {
+      "id": "safe",
+      "type": "safe_box",
+      "pos": [
+        7,
+        3
+      ],
+      "correct_password": "123",
+      "password_kind": "number"
+    },
+    {
+      "id": "door",
+      "type": "credential_door",
+      "pos": [
+        8,
+        3
+      ],
+      "requires_credential": "red_key",
+      "goal": true
+    },
+    {
+      "id": "jevin",
+      "type": "loop_npc",
+      "pos": [
+        1,
+        5
+      ],
+      "loop_kind": "courier",
+      "step_ms": 380,
+      "waypoints": [
+        {
+          "x": 2,
+          "y": 5
+        },
+        {
+          "x": 3,
+          "y": 5
+        },
+        {
+          "x": 3,
+          "y": 4
+        },
+        {
+          "x": 3,
+          "y": 3
+        },
+        {
+          "x": 3,
+          "y": 2,
+          "action": "pickup",
+          "bubble": "📦 红!"
+        },
+        {
+          "x": 3,
+          "y": 3
+        },
+        {
+          "x": 4,
+          "y": 3
+        },
+        {
+          "x": 5,
+          "y": 3
+        },
+        {
+          "x": 6,
+          "y": 3
+        },
+        {
+          "x": 7,
+          "y": 3,
+          "action": "bubble",
+          "bubble": "1..2..3"
+        },
+        {
+          "x": 8,
+          "y": 3,
+          "action": "disappear"
+        },
+        {
+          "x": 1,
+          "y": 5,
+          "action": "respawn"
+        }
+      ]
+    }
+  ],
+  "available_command_cards": [
+    {
+      "id": "move_up",
+      "category": "direction",
+      "label": "向上",
+      "icon": "arrow_up",
+      "action": "move",
+      "dir": "up",
+      "steps_input": true
+    },
+    {
+      "id": "move_down",
+      "category": "direction",
+      "label": "向下",
+      "icon": "arrow_down",
+      "action": "move",
+      "dir": "down",
+      "steps_input": true
+    },
+    {
+      "id": "move_left",
+      "category": "direction",
+      "label": "向左",
+      "icon": "arrow_left",
+      "action": "move",
+      "dir": "left",
+      "steps_input": true
+    },
+    {
+      "id": "move_right",
+      "category": "direction",
+      "label": "向右",
+      "icon": "arrow_right",
+      "action": "move",
+      "dir": "right",
+      "steps_input": true
+    },
+    {
+      "id": "take_cred",
+      "category": "credential",
+      "label": "拿起",
+      "icon": "credential_take",
+      "action": "take_credential"
+    },
+    {
+      "id": "enter_pwd",
+      "category": "password",
+      "label": "输密码",
+      "icon": "keypad",
+      "action": "enter_password"
+    }
+  ],
+  "success_condition": {
+    "type": "reach_credential_door",
+    "goal_id": "door"
+  },
+  "optimal_steps": 7,
+  "max_hint_level": 3,
+  "hints": [
+    {
+      "level": 1,
+      "text": "看快递员捡的是什么颜色。"
+    },
+    {
+      "level": 2,
+      "text": "他在保险箱旁念的几个数字就是密码。"
+    },
+    {
+      "level": 3,
+      "text": "拿红盒 → 右走到保险箱 → 输 123 → 再走到门。"
+    }
+  ],
+  "on_clear_dialog": [
+    {
+      "speaker": "小天",
+      "text": "门开啦!"
+    },
+    {
+      "speaker": "小天",
+      "text": "这叫「**重放攻击**」。"
+    },
+    {
+      "speaker": "小天",
+      "text": "坏人不懂密码也能过。"
+    },
+    {
+      "speaker": "小天",
+      "text": "看你怎么做的,照抄就行。"
+    },
+    {
+      "speaker": "小天",
+      "text": "所以密码要「**一次一变**」。"
+    },
+    {
+      "speaker": "奥伦",
+      "text": "像买菜票,撕了就作废!"
+    }
+  ],
+  "rewards": {
+    "unlock_next": "E5",
+    "first_time_dialog_card": "replay_attack_explained"
+  }
+};

@@ -1,0 +1,158 @@
+/* pages/home/home.wxss */
+
+.page {
+  height: 100vh;
+  background-color: #FFE9B8;
+  padding: 24rpx 32rpx;
+  box-sizing: border-box;
+}
+
+.header { text-align: center; margin-bottom: 28rpx; }
+.title { font-size: 60rpx; font-weight: 800; color: #2C2C2A; }
+.subtitle { display: block; font-size: 26rpx; font-weight: 600; color: #5F5E5A; margin-top: 6rpx; }
+
+/* 进度条 */
+.progress-card {
+  background: #FFFCF2;
+  border: 5rpx solid #2C2C2A;
+  border-radius: 24rpx;
+  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
+  padding: 22rpx 28rpx;
+  margin-bottom: 36rpx;
+}
+.progress-row { display: flex; align-items: center; gap: 16rpx; }
+.progress-label { font-size: 28rpx; font-weight: 700; color: #2C2C2A; }
+.progress-bar-bg {
+  flex: 1;
+  height: 24rpx;
+  background: #FFE9B8;
+  border-radius: 12rpx;
+  border: 3rpx solid #2C2C2A;
+  overflow: hidden;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: #FF6B47;
+}
+.progress-count { font-size: 28rpx; font-weight: 800; color: #5F5E5A; }
+.progress-count--has { color: #FF6B47; }
+
+/* 幕分组 */
+.act-section { margin-bottom: 36rpx; }
+.act-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 18rpx;
+  padding: 0 4rpx;
+}
+.act-title { font-size: 34rpx; font-weight: 800; color: #2C2C2A; }
+.act-meta { font-size: 24rpx; font-weight: 700; }
+.act-meta--unlocked { color: #FF6B47; }
+.act-meta--locked { color: #888780; }
+
+/* 关卡卡片网格 4 列 */
+.level-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14rpx;
+}
+
+.level-card {
+  width: 161rpx;
+  height: 220rpx;
+  background: #FFF1C9;
+  border: 4rpx solid #2C2C2A;
+  border-radius: 20rpx;
+  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
+  padding: 16rpx 8rpx 12rpx;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.level-card--locked {
+  border-style: dashed;
+  background: #FFFCF2;
+}
+.level-card--cleared {
+  background: #FFFCF2;
+  border-color: #FF6B47;
+}
+.level-card--playing {
+  background: #2C2C2A;
+}
+
+.level-id {
+  font-size: 38rpx;
+  font-weight: 900;
+  color: #2C2C2A;
+  margin-bottom: 8rpx;
+}
+.level-title {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #2C2C2A;
+  text-align: center;
+  margin-bottom: 6rpx;
+  line-height: 1.25;
+}
+.level-tag {
+  font-size: 18rpx;
+  font-weight: 600;
+  color: #5F5E5A;
+  text-align: center;
+  margin-top: auto;
+}
+
+/* 状态色覆盖 */
+.level-card--locked .level-id,
+.level-card--locked .level-title,
+.level-card--locked .level-tag { color: #888780; }
+.level-card--playing .level-id,
+.level-card--playing .level-title,
+.level-card--playing .level-tag { color: #FFE9B8; }
+
+/* 徽章 */
+.badge {
+  position: absolute;
+  top: -10rpx;
+  right: -8rpx;
+  background: #FF6B47;
+  color: #FFFFFF;
+  font-size: 22rpx;
+  font-weight: 800;
+  padding: 4rpx 12rpx;
+  border-radius: 14rpx;
+  border: 3rpx solid #2C2C2A;
+}
+.badge--cleared {
+  font-size: 28rpx;
+  padding: 0 10rpx;
+  height: 40rpx;
+  line-height: 36rpx;
+  border-radius: 20rpx;
+}
+.badge--lock {
+  position: absolute;
+  top: 6rpx;
+  right: 6rpx;
+  font-size: 22rpx;
+}
+
+/* 锁定的幕 */
+.act-locked-card {
+  background: #FFFCF2;
+  border: 5rpx dashed #2C2C2A;
+  border-radius: 24rpx;
+  padding: 36rpx 28rpx;
+  text-align: center;
+}
+.act-locked-text {
+  font-size: 26rpx;
+  font-weight: 700;
+  color: #5F5E5A;
+}
+
+.footer-spacer { height: 80rpx; }

@@ -1,0 +1,55 @@
+<!-- pages/home/home.wxml · 关卡选择页 · v7.2 设计 + Skyline DOM -->
+<scroll-view scroll-y class="page" enhanced bounces>
+  <view class="header">
+    <view class="title">白帽小队训练营</view>
+    <view class="subtitle">婉婉的冒险 · 七幕完结</view>
+  </view>
+
+  <view class="progress-card">
+    <view class="progress-row">
+      <text class="progress-label">已通关</text>
+      <view class="progress-bar-bg">
+        <view class="progress-bar-fill" style="width: {{progressPct}}%"></view>
+      </view>
+      <text class="progress-count {{cleared > 0 ? 'progress-count--has' : ''}}">{{cleared}} / {{total}}</text>
+    </view>
+  </view>
+
+  <block wx:for="{{acts}}" wx:for-item="actGroup" wx:key="act">
+    <view class="act-section">
+      <view class="act-header">
+        <text class="act-title">第{{actGroup.label}}幕 · {{actGroup.subtitle}}</text>
+        <text class="act-meta {{actGroup.unlocked ? 'act-meta--unlocked' : 'act-meta--locked'}}">
+          {{actGroup.unlocked ? actGroup.clearedInAct + ' / ' + actGroup.levels.length + ' ✓' : actGroup.levels.length + ' 关 · 锁定'}}
+        </text>
+      </view>
+
+      <view wx:if="{{actGroup.unlocked}}" class="level-grid">
+        <view
+          wx:for="{{actGroup.levels}}"
+          wx:for-item="lv"
+          wx:key="id"
+          class="level-card level-card--{{lv.state}} tap-press"
+          bindtap="onTapLevel"
+          data-id="{{lv.id}}"
+          data-state="{{lv.state}}"
+        >
+          <text class="level-id">{{lv.id}}</text>
+          <text class="level-title">{{lv.title}}</text>
+          <text wx:if="{{lv.security}}" class="level-tag">⭐ {{lv.security}}</text>
+          <text wx:elif="{{lv.concept}}" class="level-tag">{{lv.concept}}</text>
+
+          <view wx:if="{{lv.state === 'cleared'}}" class="badge badge--cleared">✓</view>
+          <view wx:elif="{{lv.state === 'playing'}}" class="badge badge--playing">在玩</view>
+          <view wx:elif="{{lv.state === 'locked'}}" class="badge--lock">🔒</view>
+        </view>
+      </view>
+
+      <view wx:else class="act-locked-card">
+        <text class="act-locked-text">🔒 {{actGroup.lockReason}}</text>
+      </view>
+    </view>
+  </block>
+
+  <view class="footer-spacer"></view>
+</scroll-view>

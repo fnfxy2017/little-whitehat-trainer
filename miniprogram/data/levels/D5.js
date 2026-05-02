@@ -1,0 +1,281 @@
+module.exports = {
+  "id": "D5",
+  "title": "带字条的礼物",
+  "act": 4,
+  "chapter": "实战篇",
+  "location": "樱桃镇妈妈的厨房",
+  "concept_intro": "CSRF · 跨站请求伪造",
+  "security_concept": {
+    "name": "CSRF",
+    "analogy": "坏人借你登录过的身份,替他办事。",
+    "defense": "陌生链接先别点,转账类要再开一次窗口。"
+  },
+  "available_commands": [
+    "direction"
+  ],
+  "intro_dialog": [
+    {
+      "speaker": "水母妹妹",
+      "text": "妈妈在用网上银行呢。"
+    },
+    {
+      "speaker": "水母妹妹",
+      "text": "叮!四个红包都到了!"
+    },
+    {
+      "speaker": "小天",
+      "text": "我先把字条念一遍:"
+    },
+    {
+      "speaker": "小天",
+      "text": "1 号:点这里领红包!"
+    },
+    {
+      "speaker": "小天",
+      "text": "2 号:祝你生日快乐!"
+    },
+    {
+      "speaker": "小天",
+      "text": "3 号:帮我转 100 块!"
+    },
+    {
+      "speaker": "小天",
+      "text": "4 号:点我填银行密码!"
+    },
+    {
+      "speaker": "小天",
+      "text": "只拆真心的那个红包。"
+    }
+  ],
+  "map": {
+    "size": [
+      10,
+      7
+    ],
+    "tileset": "street",
+    "walls": [
+      {
+        "x": 0,
+        "y": 0,
+        "w": 10,
+        "h": 1
+      },
+      {
+        "x": 0,
+        "y": 6,
+        "w": 10,
+        "h": 1
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 7
+      },
+      {
+        "x": 9,
+        "y": 0,
+        "w": 1,
+        "h": 7
+      }
+    ],
+    "objects": [
+      {
+        "type": "table",
+        "pos": [
+          6,
+          3
+        ],
+        "size": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "stove",
+        "pos": [
+          8,
+          5
+        ],
+        "size": [
+          1,
+          1
+        ]
+      },
+      {
+        "type": "plant",
+        "pos": [
+          1,
+          5
+        ],
+        "size": [
+          1,
+          1
+        ]
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "player",
+      "type": "wanwan",
+      "start_pos": [
+        1,
+        3
+      ],
+      "facing": "right",
+      "tier": 2
+    },
+    {
+      "id": "mama",
+      "type": "shuimu",
+      "pos": [
+        8,
+        3
+      ],
+      "facing": "left",
+      "tier": 2,
+      "hint_text": "别点错哦~"
+    },
+    {
+      "id": "pinki",
+      "type": "pinki",
+      "pos": [
+        1,
+        2
+      ],
+      "facing": "right",
+      "tier": 2,
+      "role": "follower",
+      "follows": "player"
+    },
+    {
+      "id": "gift_1",
+      "type": "blocked_door",
+      "pos": [
+        4,
+        1
+      ],
+      "label": "🎁 1",
+      "message": "拆开才发现是「领红包」,坏的!"
+    },
+    {
+      "id": "gift_2",
+      "type": "goal_zone",
+      "pos": [
+        4,
+        3
+      ],
+      "goal": true,
+      "label": "🎁 2"
+    },
+    {
+      "id": "gift_3",
+      "type": "blocked_door",
+      "pos": [
+        4,
+        5
+      ],
+      "label": "🎁 3",
+      "message": "拆开才发现是「转账」,坏的!"
+    },
+    {
+      "id": "gift_4",
+      "type": "blocked_door",
+      "pos": [
+        7,
+        1
+      ],
+      "label": "🎁 4",
+      "message": "拆开才发现要「填密码」,坏的!"
+    }
+  ],
+  "available_command_cards": [
+    {
+      "id": "move_up",
+      "category": "direction",
+      "label": "向上",
+      "icon": "arrow_up",
+      "action": "move",
+      "dir": "up",
+      "steps_input": true
+    },
+    {
+      "id": "move_down",
+      "category": "direction",
+      "label": "向下",
+      "icon": "arrow_down",
+      "action": "move",
+      "dir": "down",
+      "steps_input": true
+    },
+    {
+      "id": "move_left",
+      "category": "direction",
+      "label": "向左",
+      "icon": "arrow_left",
+      "action": "move",
+      "dir": "left",
+      "steps_input": true
+    },
+    {
+      "id": "move_right",
+      "category": "direction",
+      "label": "向右",
+      "icon": "arrow_right",
+      "action": "move",
+      "dir": "right",
+      "steps_input": true
+    }
+  ],
+  "success_condition": {
+    "type": "reach_goal",
+    "goal_id": "gift_2"
+  },
+  "optimal_steps": 3,
+  "max_hint_level": 3,
+  "hints": [
+    {
+      "level": 1,
+      "text": "记开场念的字条内容。"
+    },
+    {
+      "level": 2,
+      "text": "带「转账/填密码」都是坏的。"
+    },
+    {
+      "level": 3,
+      "text": "选 2 号红包!「生日快乐」。"
+    }
+  ],
+  "on_clear_dialog": [
+    {
+      "speaker": "水母妹妹",
+      "text": "幸好拦住了!"
+    },
+    {
+      "speaker": "小天",
+      "text": "这叫 **CSRF**。"
+    },
+    {
+      "speaker": "小天",
+      "text": "坏人借你登录过的身份。"
+    },
+    {
+      "speaker": "小天",
+      "text": "你点一下,钱就飞啦!"
+    },
+    {
+      "speaker": "平基",
+      "text": "**陌生链接都不点**!"
+    },
+    {
+      "speaker": "小天",
+      "text": "转账要**再开新窗口**确认。"
+    }
+  ],
+  "rewards": {
+    "unlock_next": "D6",
+    "first_time_dialog_card": "csrf_explained"
+  }
+};

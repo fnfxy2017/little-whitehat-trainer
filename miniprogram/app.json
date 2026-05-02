@@ -1,0 +1,26 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/level/level"
+  ],
+  "renderer": "skyline",
+  "rendererOptions": {
+    "skyline": {
+      "defaultDisplayBlock": true,
+      "disableABTest": true,
+      "sdkVersionBegin": "3.0.0",
+      "sdkVersionEnd": "15.255.255"
+    }
+  },
+  "componentFramework": "glass-easel",
+  "lazyCodeLoading": "requiredComponents",
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFE9B8",
+    "navigationBarTitleText": "白帽小队训练营",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFE9B8"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

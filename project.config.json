@@ -1,0 +1,35 @@
+{
+  "description": "白帽小队训练营 · 婉婉的冒险(小程序版,wechat-new 分支)",
+  "miniprogramRoot": "miniprogram/",
+  "projectname": "wanwan-mini",
+  "appid": "wx4ed9cbc9e1a28c3f",
+  "compileType": "miniprogram",
+  "libVersion": "3.15.2",
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "skylineRenderEnable": true,
+    "ignoreUploadUnusedFiles": true,
+    "lazyloadPlaceholderEnable": false,
+    "useIsolateContext": true,
+    "compileHotReLoad": true
+  },
+  "packOptions": {
+    "ignore": [
+      { "type": "folder", "value": ".claude" },
+      { "type": "folder", "value": "tests" },
+      { "type": "folder", "value": "assets/_prompts" },
+      { "type": "file", "value": "README.md" },
+      { "type": "file", "value": ".gitignore" },
+      { "type": "file", "value": "index.html" },
+      { "type": "file", "value": "levels.html" },
+      { "type": "file", "value": "game.js" },
+      { "type": "folder", "value": "levels" }
+    ]
+  },
+  "condition": {}
+}

@@ -1,0 +1,208 @@
+module.exports = {
+  "id": "E5",
+  "title": "字里藏箭",
+  "act": 5,
+  "chapter": "余烬反扑",
+  "location": "樱桃镇邮局",
+  "concept_intro": "注入(位置)",
+  "security_concept": {
+    "name": "注入的位置问题",
+    "analogy": "同样一条指令,插错位置就出事。",
+    "defense": "每一步都要检查,顺序也要看。"
+  },
+  "inject_mode": true,
+  "available_commands": [
+    "function"
+  ],
+  "preset_queue": [
+    {
+      "id": "p1",
+      "action": "move",
+      "dir": "right",
+      "steps": 4,
+      "label": "走到家门口",
+      "icon": "arrow_right"
+    },
+    {
+      "id": "p2",
+      "action": "press_button",
+      "label": "按门铃",
+      "icon": "hand_knock"
+    }
+  ],
+  "intro_dialog": [
+    {
+      "speaker": "小天",
+      "text": "婉婉,帮忙送封信!"
+    },
+    {
+      "speaker": "小天",
+      "text": "队列里少了一步。"
+    },
+    {
+      "speaker": "小天",
+      "text": "「**放下信**」,要插在哪?"
+    },
+    {
+      "speaker": "小天",
+      "text": "先到门口,放下信,再按门铃。"
+    },
+    {
+      "speaker": "小天",
+      "text": "顺序错了,信就没送到。"
+    }
+  ],
+  "map": {
+    "size": [
+      10,
+      5
+    ],
+    "tileset": "street",
+    "walls": [
+      {
+        "x": 0,
+        "y": 0,
+        "w": 10,
+        "h": 1
+      },
+      {
+        "x": 0,
+        "y": 4,
+        "w": 10,
+        "h": 1
+      },
+      {
+        "x": 0,
+        "y": 0,
+        "w": 1,
+        "h": 5
+      },
+      {
+        "x": 9,
+        "y": 0,
+        "w": 1,
+        "h": 5
+      }
+    ],
+    "objects": [
+      {
+        "type": "plant",
+        "pos": [
+          8,
+          3
+        ],
+        "size": [
+          1,
+          1
+        ]
+      }
+    ]
+  },
+  "entities": [
+    {
+      "id": "player",
+      "type": "wanwan",
+      "start_pos": [
+        1,
+        2
+      ],
+      "facing": "right",
+      "tier": 2
+    },
+    {
+      "id": "rule",
+      "type": "info_stone",
+      "pos": [
+        3,
+        3
+      ],
+      "hint_text": "先到门口,放下信,再按门铃。"
+    },
+    {
+      "id": "bell",
+      "type": "button",
+      "pos": [
+        5,
+        3
+      ],
+      "label": "🔔 门铃"
+    },
+    {
+      "id": "house",
+      "type": "goal_zone",
+      "pos": [
+        5,
+        2
+      ],
+      "goal": true,
+      "label": "🏠 收信人家"
+    }
+  ],
+  "available_command_cards": [
+    {
+      "id": "inject_drop",
+      "category": "function",
+      "label": "放下信",
+      "icon": "hand_drop",
+      "action": "drop",
+      "injectable": true
+    }
+  ],
+  "success_condition": {
+    "type": "execute_safe_queue",
+    "must_keep_actions": [
+      "move",
+      "drop",
+      "press_button"
+    ],
+    "required_order": [
+      "move",
+      "drop",
+      "press_button"
+    ],
+    "reach_goal_id": "house"
+  },
+  "optimal_steps": 3,
+  "max_hint_level": 3,
+  "hints": [
+    {
+      "level": 1,
+      "text": "点「放下信」,再点队列中间的 ➕。"
+    },
+    {
+      "level": 2,
+      "text": "到门口之后,按门铃之前,放下信。"
+    },
+    {
+      "level": 3,
+      "text": "插在「走到家门口」和「按门铃」之间。"
+    }
+  ],
+  "on_clear_dialog": [
+    {
+      "speaker": "小天",
+      "text": "信送到啦!"
+    },
+    {
+      "speaker": "小天",
+      "text": "这叫「**注入位置**」。"
+    },
+    {
+      "speaker": "小天",
+      "text": "同样的指令,插错也出事。"
+    },
+    {
+      "speaker": "小天",
+      "text": "每一步都要看,**顺序**也要看。"
+    },
+    {
+      "speaker": "平基",
+      "text": "谁塞的、塞哪里,都要查!"
+    }
+  ],
+  "manual_tip": "🧩 这一关<br>需要你<br><strong>点「放下信」</strong><br>然后点队列中间<br><strong>橘色的 ➕</strong><br>选择插入位置<br><br>位置选对再按 ▶",
+  "rewards": {
+    "unlock_next": "E6",
+    "first_time_dialog_card": "injection_position"
+  }
+};
