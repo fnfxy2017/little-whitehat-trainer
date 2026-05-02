@@ -68,6 +68,9 @@ Page({
     // 失败
     failMessage: '',
 
+    // 庆祝特效
+    showCelebration: false,
+
     // 步数选择面板
     showStepPicker: false,
     pickerCard: null,
@@ -389,7 +392,10 @@ Page({
   _runAtoms(atoms, i) {
     if (i >= atoms.length) {
       if (executor.checkSuccess(this._state)) {
-        this._handleClear();
+        // 短暂停顿,让玩家看清婉婉已到终点,再触发庆祝
+        this._execTimer = setTimeout(() => {
+          this._handleClear();
+        }, 350);
       } else {
         this._state.phase = 'failed';
         this.setData({
@@ -443,8 +449,20 @@ Page({
       console.error('[game] 进度写入失败', e);
     }
 
-    this.setData({ phase: 'cleared' });
-    this._showCurrentDialog();
+    // 1. 先触发庆祝特效(800ms 动画)
+    this.setData({ showCelebration: true });
+
+    // 震动反馈(短促一下)
+    try { wx.vibrateShort({ type: 'medium' }); } catch (e) {}
+
+    // 2. 800ms 后特效消失,弹出通关结果卡
+    setTimeout(() => {
+      this.setData({
+        showCelebration: false,
+        phase: 'cleared'
+      });
+      this._showCurrentDialog();
+    }, 800);
   },
 
   // =========================================================================

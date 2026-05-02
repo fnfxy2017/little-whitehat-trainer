@@ -94,21 +94,36 @@
     <view class="exec-btn {{queue.length > 0 ? '' : '--disabled'}}" bindtap="onExecute">▶ 执行</view>
   </view>
 
+  <!-- 通关瞬间庆祝特效(0.8 秒) -->
+  <view wx:if="{{showCelebration}}" class="celebration-overlay">
+    <view class="celebration-burst"></view>
+    <view class="celebration-trophy">🏆</view>
+    <view class="celebration-text">过关!</view>
+    <view class="celebration-spark spark-1"></view>
+    <view class="celebration-spark spark-2"></view>
+    <view class="celebration-spark spark-3"></view>
+    <view class="celebration-spark spark-4"></view>
+    <view class="celebration-spark spark-5"></view>
+    <view class="celebration-spark spark-6"></view>
+  </view>
+
   <!-- 通关弹窗 -->
   <view wx:if="{{phase === 'cleared'}}" class="cleared-overlay">
-    <view class="cleared-card">
-      <view class="cleared-trophy">🏆</view>
-      <view class="cleared-title">过关!</view>
-      <view class="cleared-meta">用了 {{queueStepCount}} 步</view>
-      <view wx:if="{{currentDialog}}" class="cleared-dialog">
-        <view class="cleared-speaker">{{currentDialog.speaker}}</view>
-        <view class="cleared-text">{{currentDialog.text}}</view>
+    <scroll-view scroll-y class="cleared-scroll">
+      <view class="cleared-card">
+        <view class="cleared-trophy">🏆</view>
+        <view class="cleared-title">过关!</view>
+        <view class="cleared-meta">用了 {{queueStepCount}} 步</view>
+        <view wx:if="{{currentDialog}}" class="cleared-dialog">
+          <view class="cleared-speaker">{{currentDialog.speaker}}</view>
+          <view class="cleared-text">{{currentDialog.text}}</view>
+        </view>
+        <view class="cleared-actions">
+          <view wx:if="{{currentDialog && !dialogIsLast}}" class="cleared-btn-secondary" bindtap="onDialogNext">下一句</view>
+          <view wx:else class="cleared-btn-primary" bindtap="onBack">返回选关</view>
+        </view>
       </view>
-      <view class="cleared-actions">
-        <view wx:if="{{currentDialog && !dialogIsLast}}" class="cleared-btn-secondary" bindtap="onDialogNext">下一句</view>
-        <view wx:else class="cleared-btn-primary" bindtap="onBack">返回选关</view>
-      </view>
-    </view>
+    </scroll-view>
   </view>
 
   <!-- 失败提示 -->
