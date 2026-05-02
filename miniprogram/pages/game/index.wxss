@@ -398,16 +398,21 @@
   bottom: 0;
   background: rgba(44, 44, 42, 0.6);
   z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  /* 用 scroll-view 包裹整个 overlay,确保即使内容超长也能滚动看到全部 */
+  overflow-y: auto;
 }
 
 .cleared-scroll {
   width: 100%;
-  max-height: 100vh;
-  padding: 60rpx 32rpx 80rpx;
+  height: 100%;
+  /* 顶部 + 底部 留充足 padding,避免被状态栏 / 安全区遮挡 */
+  padding: 120rpx 32rpx 100rpx;
   box-sizing: border-box;
+  /* flex 让卡片在可用空间内居中,但不会顶到边缘 */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
 .cleared-card {
@@ -419,7 +424,6 @@
   text-align: center;
   width: 100%;
   max-width: 600rpx;
-  margin: 0 auto;
   animation: cleared-pop-in 0.4s ease-out 0.4s backwards;
 }
 
