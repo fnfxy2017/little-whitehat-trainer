@@ -40,9 +40,10 @@ function adapt(raw) {
     }
   }
 
-  // NPCs(非 player / goal / item / 可染色实体)
+  // NPCs(非 player / goal / item / 可染色实体 / 可浇灌目标)
   const npcs = [];
   const colorables = {};
+  const targets = {};  // T5 等可浇灌/交互目标(flower 等)
   for (const e of raw.entities || []) {
     if (e.id === 'player') continue;
     if (e.pickupable || e.type === 'item' || e.type === 'credential') continue;
@@ -53,6 +54,16 @@ function adapt(raw) {
         x: e.pos[0],
         y: e.pos[1],
         required: e.required_sequence || []
+      };
+      continue;
+    }
+    if (e.type === 'flower') {
+      targets[e.id] = {
+        id: e.id,
+        type: 'flower',
+        x: e.pos[0],
+        y: e.pos[1],
+        watered: !!e.watered
       };
       continue;
     }
@@ -71,9 +82,11 @@ function adapt(raw) {
     label: c.label || '',
     icon: c.icon || c.action || '',
     action: c.action,
-    dir: c.dir,           // direction 卡用
-    color: c.color,       // color 卡用
-    stepsInput: c.steps_input || false
+    dir: c.dir,
+    color: c.color,
+    stepsInput: c.steps_input || false,
+    timesInput: c.times_input || false,
+    isContainer: c.is_container || false
   }));
 
   return {
@@ -101,6 +114,7 @@ function adapt(raw) {
     items,
     npcs,
     colorables,
+    targets,
     goal: goalEntity ? {
       type: goalEntity.type,
       id: goalEntity.id || 'goal',

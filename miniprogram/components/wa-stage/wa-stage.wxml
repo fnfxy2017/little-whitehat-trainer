@@ -102,6 +102,37 @@
     </view>
   </view>
 
+  <!-- 7c. 花朵(T5)— 未浇水/已浇水两态 -->
+  <view
+    wx:for="{{flowers}}"
+    wx:for-item="fl"
+    wx:key="id"
+    class="flower {{fl.watered ? 'flower--watered' : 'flower--dry'}}"
+    style="left: {{fl.x * cellSize}}px; top: {{fl.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
+  >
+    <view class="flower-pot"></view>
+    <view class="flower-stem"></view>
+    <view class="flower-bloom">
+      <view class="petal petal--top"></view>
+      <view class="petal petal--right"></view>
+      <view class="petal petal--bottom"></view>
+      <view class="petal petal--left"></view>
+      <view class="flower-center"></view>
+    </view>
+    <view wx:if="{{fl.watered}}" class="flower-leaf"></view>
+  </view>
+
+  <!-- 7d. 浇水水滴动画 -->
+  <view
+    wx:if="{{wateringEffect}}"
+    class="watering-effect"
+    style="left: {{wateringEffect.x * cellSize}}px; top: {{wateringEffect.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
+  >
+    <view class="water-drop drop-1">💧</view>
+    <view class="water-drop drop-2">💧</view>
+    <view class="water-drop drop-3">💧</view>
+  </view>
+
   <!-- 8. 婉婉 -->
   <view
     class="wanwan {{celebrating ? 'wanwan--celebrate' : ''}}"

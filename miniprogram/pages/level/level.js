@@ -14,7 +14,8 @@ const CARD_ICON = {
   set_color: '🎨',
   color_red: '🔴', color_yellow: '🟡', color_green: '🟢', color_blue: '🔵',
   take_credential: '🪪', credential_take: '🪪',
-  water: '💧', repeat: '🔁'
+  water: '💧', water_drop: '💧',
+  repeat: '🔁', repeat_loop: '🔁'
 };
 
 Page({
@@ -35,6 +36,12 @@ Page({
     showStepPicker: false,
     stepPickerLabel: '',
     stepPickerCard: null,
+
+    // 重复容器编辑(T5)
+    showRepeatEditor: false,
+    repeatTimes: 5,
+    repeatBody: [],          // 容器内的子指令 [{ icon, label, action, dir, ... }]
+    repeatEditorCard: null,  // 当前正在编辑的 repeat 卡片
 
     // 结果弹窗
     showResult: false,
@@ -125,9 +132,32 @@ Page({
   onTapCard(e) {
     if (this.data.running) return;
     const id = e.currentTarget.dataset.id;
-    const card = this.data.level.cards.find(c => c.id === id);
+    const card = this.data.level.cards.find(function (c) { return c.id === id; });
     if (!card) return;
 
+    // 容器卡片(repeat)→ 打开重复编辑器
+    if (card.isContainer) {
+      // 如果在容器编辑模式中又点了 repeat,忽略(暂不支持嵌套)
+      if (this.data.showRepeatEditor) {
+        wx.showToast({ title: '不能嵌套重复', icon: 'none' });
+        return;
+      }
+      this.setData({
+        showRepeatEditor: true,
+        repeatTimes: 5,
+        repeatBody: [],
+        repeatEditorCard: card
+      });
+      return;
+    }
+
+    // 容器编辑模式中点了普通卡片 → 加进容器
+    if (this.data.showRepeatEditor) {
+      this._addToRepeatBody(card);
+      return;
+    }
+
+    // 步数输入卡 → 弹步数选择
     if (card.stepsInput) {
       this.setData({
         showStepPicker: true,
@@ -137,6 +167,71 @@ Page({
       return;
     }
     this._pushCard(card, 1);
+  },
+
+  // ---- 容器内添加子指令 ----
+  _addToRepeatBody(card) {
+    // 容器内不再支持 stepsInput(简化);如果是 stepsInput 卡,默认 1 步
+    const item = {
+      key: 'rb-' + Date.now() + '-' + Math.random().toString(36).slice(2, 5),
+      cardId: card.id,
+      action: card.action,
+      dir: card.dir,
+      color: card.color,
+      steps: card.stepsInput ? 1 : null,
+      label: card.label,
+      icon: card.iconText
+    };
+    const repeatBody = this.data.repeatBody.concat([item]);
+    this.setData({ repeatBody: repeatBody });
+  },
+
+  onTapRepeatBodyItem(e) {
+    const idx = e.currentTarget.dataset.index;
+    const repeatBody = this.data.repeatBody.slice();
+    repeatBody.splice(idx, 1);
+    this.setData({ repeatBody: repeatBody });
+  },
+
+  onPickRepeatTimes(e) {
+    const n = e.currentTarget.dataset.n;
+    this.setData({ repeatTimes: n });
+  },
+
+  onConfirmRepeat() {
+    if (this.data.repeatBody.length === 0) {
+      wx.showToast({ title: '里面要放点指令', icon: 'none' });
+      return;
+    }
+    const card = this.data.repeatEditorCard;
+    const times = this.data.repeatTimes;
+    const body = this.data.repeatBody.slice();
+    // 包成一个特殊 queue item:action='repeat',body=[],times=N
+    const item = {
+      key: 'q-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+      cardId: card.id,
+      action: 'repeat',
+      times: times,
+      body: body,
+      label: card.label + ' ' + times + ' 次',
+      icon: card.iconText,
+      locked: false
+    };
+    const queue = this.data.queue.concat([item]);
+    this.setData({
+      queue: queue,
+      showRepeatEditor: false,
+      repeatBody: [],
+      repeatEditorCard: null
+    });
+  },
+
+  onCancelRepeat() {
+    this.setData({
+      showRepeatEditor: false,
+      repeatBody: [],
+      repeatEditorCard: null
+    });
   },
 
   onPickSteps(e) {
@@ -158,12 +253,12 @@ Page({
       dir: card.dir,
       color: card.color,
       steps: card.stepsInput ? steps : null,
-      label: (card.stepsInput && steps > 1) ? `${card.label} ${steps} 步` : card.label,
+      label: (card.stepsInput && steps > 1) ? (card.label + ' ' + steps + ' 步') : card.label,
       icon: card.iconText,
       locked: false
     };
     const queue = this.data.queue.concat([item]);
-    this.setData({ queue });
+    this.setData({ queue: queue });
   },
 
   onTapQueueItem(e) {
@@ -203,18 +298,35 @@ Page({
       return;
     }
 
+    // 把队列展开:把 repeat 容器拆成 N 倍的子指令序列
+    var expanded = [];
     var queue = this.data.queue;
+    for (var k = 0; k < queue.length; k++) {
+      var cmd = queue[k];
+      if (cmd.action === 'repeat') {
+        var times = cmd.times || 1;
+        var body = cmd.body || [];
+        for (var t = 0; t < times; t++) {
+          for (var b = 0; b < body.length; b++) {
+            expanded.push(body[b]);
+          }
+        }
+      } else {
+        expanded.push(cmd);
+      }
+    }
+
     var i = 0;
     function runNext() {
-      if (i >= queue.length) {
+      if (i >= expanded.length) {
         var stepCount = stage.getStepCount();
         self.setData({ running: false, stepCount: stepCount });
         self._checkComplete();
         return;
       }
-      var cmd = queue[i];
+      var c = expanded[i];
       i++;
-      stage.execute(cmd, cmd.steps).then(runNext, function (err) {
+      stage.execute(c, c.steps).then(runNext, function (err) {
         console.error('[level] 执行出错:', err);
         var stepCount = stage.getStepCount();
         self.setData({ running: false, stepCount: stepCount });

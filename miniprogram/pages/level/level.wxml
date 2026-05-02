@@ -42,12 +42,23 @@
         wx:for="{{queue}}"
         wx:for-item="q"
         wx:key="key"
-        class="queue-item {{q.locked ? 'queue-item--locked' : ''}}"
+        class="queue-item {{q.action === 'repeat' ? 'queue-item--repeat' : ''}} {{q.locked ? 'queue-item--locked' : ''}}"
         bindtap="onTapQueueItem"
         data-index="{{index}}"
       >
-        <text class="queue-icon">{{q.icon}}</text>
-        <text class="queue-label-text">{{q.label}}</text>
+        <block wx:if="{{q.action === 'repeat'}}">
+          <view class="repeat-header">
+            <text class="repeat-icon">🔁</text>
+            <text class="repeat-times">×{{q.times}}</text>
+          </view>
+          <view class="repeat-body-mini">
+            <text wx:for="{{q.body}}" wx:for-item="bi" wx:key="key" class="repeat-body-icon">{{bi.icon}}</text>
+          </view>
+        </block>
+        <block wx:else>
+          <text class="queue-icon">{{q.icon}}</text>
+          <text class="queue-label-text">{{q.label}}</text>
+        </block>
       </view>
     </scroll-view>
     <view wx:else class="queue-empty">
@@ -61,7 +72,7 @@
       wx:for="{{level.cards}}"
       wx:for-item="c"
       wx:key="id"
-      class="card tap-press"
+      class="card tap-press {{c.isContainer ? 'card--container' : ''}}"
       bindtap="onTapCard"
       data-id="{{c.id}}"
     >
@@ -85,6 +96,66 @@
         >{{n}}</view>
       </view>
       <view class="step-picker-cancel" bindtap="onCancelStepPicker">取消</view>
+    </view>
+  </view>
+
+  <!-- 重复编辑器(底部全屏抽屉) -->
+  <view wx:if="{{showRepeatEditor}}" class="repeat-editor-overlay" bindtap="onCancelRepeat">
+    <view class="repeat-editor-card" catchtap="">
+      <view class="repeat-editor-title">🔁 设置"重复"指令</view>
+
+      <!-- 1) 重复多少次 -->
+      <view class="repeat-section-label">重复几次?</view>
+      <view class="repeat-times-grid">
+        <view
+          wx:for="{{[2,3,4,5,6,7,8,9,10]}}"
+          wx:for-item="n"
+          wx:key="*this"
+          class="times-cell tap-press {{repeatTimes === n ? 'times-cell--active' : ''}}"
+          bindtap="onPickRepeatTimes"
+          data-n="{{n}}"
+        >{{n}}</view>
+      </view>
+
+      <!-- 2) 容器内的指令 -->
+      <view class="repeat-section-label">里面要做什么?({{repeatBody.length}} 条)</view>
+      <view class="repeat-body-area">
+        <block wx:if="{{repeatBody.length > 0}}">
+          <view
+            wx:for="{{repeatBody}}"
+            wx:for-item="rb"
+            wx:key="key"
+            class="repeat-body-item tap-press"
+            bindtap="onTapRepeatBodyItem"
+            data-index="{{index}}"
+          >
+            <text class="repeat-body-item-icon">{{rb.icon}}</text>
+            <text class="repeat-body-item-label">{{rb.label}}</text>
+          </view>
+        </block>
+        <view wx:else class="repeat-body-empty">点下面的卡片加进来 ↓</view>
+      </view>
+
+      <!-- 3) 在编辑器里也显示卡片栏(供选择) -->
+      <view class="repeat-card-tray">
+        <view
+          wx:for="{{level.cards}}"
+          wx:for-item="c"
+          wx:key="id"
+          class="card-mini tap-press {{c.isContainer ? 'card-mini--disabled' : ''}}"
+          bindtap="onTapCard"
+          data-id="{{c.id}}"
+        >
+          <text class="card-mini-icon">{{c.iconText}}</text>
+          <text class="card-mini-label">{{c.label}}</text>
+        </view>
+      </view>
+
+      <!-- 4) 操作按钮 -->
+      <view class="repeat-editor-actions">
+        <view class="btn btn-secondary tap-press" bindtap="onCancelRepeat">取消</view>
+        <view class="btn btn-primary tap-press" bindtap="onConfirmRepeat">确定</view>
+      </view>
     </view>
   </view>
 

@@ -40,9 +40,11 @@ Component({
     stepDuration: 280,
     heldItemIcon: '',
     groundItems: [],
-    colorables: [],   // [{ id, x, y, litRed, litYellow, litGreen }]
-    goal: null,       // { kind: 'door' | 'zone' | 'cred-door', x, y, icon, unlocked }
-    takingItem: null, // { id, fromX, fromY, toX, toY, icon } 取证件飞行动画
+    colorables: [],
+    flowers: [],      // T5:[{ id, x, y, watered }]
+    goal: null,
+    takingItem: null,
+    wateringEffect: null,  // 浇水时的水滴动画 { x, y, key }
 
     celebrating: false
   },
@@ -171,21 +173,29 @@ Component({
       // 信号灯
       const colorables = [];
       this._colorables = {};
-      for (const e of level.map.objects || []) { /* none from objects */ }
-      // 从 level.npcs / 自带 traffic_light 在 entities 里
-      // adapter 没单独处理 traffic_light,要从原始 level 拿
-      const rawEntities = (level.__rawEntities) || [];
-      // 我没把 raw entities 透传过来,改在 loader 里加
-      // 暂时:level.colorables(loader 加) 或 level 上直接挂的 traffic_light
       for (const id of Object.keys(level.colorables || {})) {
         const c = level.colorables[id];
         this._colorables[id] = {
-          id, x: c.x, y: c.y,
+          id: id, x: c.x, y: c.y,
           required: c.required, sequence: []
         };
         colorables.push({
-          id, x: c.x, y: c.y,
+          id: id, x: c.x, y: c.y,
           litRed: false, litYellow: false, litGreen: false
+        });
+      }
+
+      // 花朵 (T5)
+      const flowers = [];
+      this._flowers = {};
+      for (const id of Object.keys(level.targets || {})) {
+        const t = level.targets[id];
+        if (t.type !== 'flower') continue;
+        this._flowers[id] = {
+          id: id, x: t.x, y: t.y, watered: !!t.watered
+        };
+        flowers.push({
+          id: id, x: t.x, y: t.y, watered: !!t.watered
         });
       }
 
@@ -213,15 +223,23 @@ Component({
       this._wallSet = wallSet;
 
       this.setData({
-        walls, walkables, decoratives, furniture, npcs,
+        walls: walls,
+        walkables: walkables,
+        decoratives: decoratives,
+        furniture: furniture,
+        npcs: npcs,
         playerX: level.player.startX,
         playerY: level.player.startY,
-        groundItems, colorables, goal,
+        groundItems: groundItems,
+        colorables: colorables,
+        flowers: flowers,
+        goal: goal,
         heldItemIcon: '',
+        wateringEffect: null,
         celebrating: false
       });
 
-      this._holding = null;     // 当前手持 itemId
+      this._holding = null;
       this._stepCount = 0;
     },
 
@@ -309,6 +327,10 @@ Component({
         }
         if (action === 'take_credential') {
           self._executeTakeCredential(resolve);
+          return;
+        }
+        if (action === 'water') {
+          self._executeWater(resolve);
           return;
         }
         console.warn('[wa-stage] 未支持的 action:', action);
@@ -450,17 +472,60 @@ Component({
       const id = this._findColorableNearPlayer();
       if (!id) return;
       this._colorables[id].sequence.push(color);
-      // 更新视觉:点亮对应灯
-      const colorables = this.data.colorables.map(c => {
+      const colorables = this.data.colorables.map(function (c) {
         if (c.id !== id) return c;
         const seq = this._colorables[id].sequence;
         return Object.assign({}, c, {
-          litRed: seq.includes('red'),
-          litYellow: seq.includes('yellow'),
-          litGreen: seq.includes('green')
+          litRed: seq.indexOf('red') >= 0,
+          litYellow: seq.indexOf('yellow') >= 0,
+          litGreen: seq.indexOf('green') >= 0
         });
+      }.bind(this));
+      this.setData({ colorables: colorables });
+    },
+
+    /**
+     * 浇水 · 找附近(同格 + 4 邻)未浇过的花,标记浇水 + 短动画
+     */
+    _executeWater(resolve) {
+      const self = this;
+      const px = this.data.playerX, py = this.data.playerY;
+      const cands = [[px, py], [px+1, py], [px-1, py], [px, py+1], [px, py-1]];
+      let id = null;
+      for (let i = 0; i < cands.length; i++) {
+        const cx = cands[i][0], cy = cands[i][1];
+        const ids = Object.keys(this._flowers);
+        for (let j = 0; j < ids.length; j++) {
+          const f = this._flowers[ids[j]];
+          if (f.watered) continue;
+          if (f.x === cx && f.y === cy) { id = ids[j]; break; }
+        }
+        if (id) break;
+      }
+      if (!id) {
+        // 附近没花或花都浇过了 — 空转
+        wx.vibrateShort && wx.vibrateShort({ type: 'light' });
+        setTimeout(resolve, 200);
+        return;
+      }
+
+      // 触发水滴动画(花的位置)
+      const f = this._flowers[id];
+      this.setData({
+        wateringEffect: { x: f.x, y: f.y, key: 'w-' + Date.now() }
       });
-      this.setData({ colorables });
+
+      // 350ms 后:标记 watered + 更新视觉,清除水滴
+      setTimeout(function () {
+        self._flowers[id].watered = true;
+        const flowers = self.data.flowers.map(function (fl) {
+          if (fl.id !== id) return fl;
+          return Object.assign({}, fl, { watered: true });
+        });
+        self.setData({ flowers: flowers, wateringEffect: null });
+        wx.vibrateShort && wx.vibrateShort({ type: 'light' });
+        resolve();
+      }, 350);
     },
 
     /**
@@ -495,6 +560,16 @@ Component({
         for (let i = 0; i < r.length; i++) if (r[i] !== s[i]) return false;
         return true;
       }
+
+      if (cond.type === 'all_watered') {
+        const ids = cond.entity_ids || Object.keys(this._flowers);
+        for (let i = 0; i < ids.length; i++) {
+          const f = this._flowers[ids[i]];
+          if (!f || !f.watered) return false;
+        }
+        return true;
+      }
+
       return false;
     },
 

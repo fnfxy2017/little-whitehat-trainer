@@ -153,6 +153,126 @@
   z-index: 6;
 }
 
+/* ============ 7c. 花朵(T5) ============ */
+.flower {
+  position: absolute;
+  z-index: 7;
+  pointer-events: none;
+}
+
+/* 花盆(底部) */
+.flower-pot {
+  position: absolute;
+  bottom: 6%;
+  left: 30%;
+  width: 40%;
+  height: 22%;
+  background: #B85A3C;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 0 0 6rpx 6rpx;
+  clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+  -webkit-clip-path: polygon(10% 0, 90% 0, 100% 100%, 0 100%);
+  box-sizing: border-box;
+}
+
+/* 茎 */
+.flower-stem {
+  position: absolute;
+  bottom: 24%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 5rpx;
+  height: 28%;
+  background: #5C8E3E;
+}
+
+/* 花朵主体 */
+.flower-bloom {
+  position: absolute;
+  top: 18%;
+  left: 22%;
+  width: 56%;
+  height: 42%;
+}
+
+.petal {
+  position: absolute;
+  width: 38%;
+  height: 38%;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50%;
+  box-sizing: border-box;
+}
+.petal--top    { top: 0;    left: 31%;     background: #FF8FB8; }
+.petal--right  { top: 31%;  right: 0;      background: #FF8FB8; }
+.petal--bottom { bottom: 0; left: 31%;     background: #FF8FB8; }
+.petal--left   { top: 31%;  left: 0;       background: #FF8FB8; }
+
+.flower-center {
+  position: absolute;
+  top: 30%; left: 30%;
+  width: 40%; height: 40%;
+  background: #F5C724;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50%;
+  box-sizing: border-box;
+  z-index: 2;
+}
+
+/* 干花:灰色枯萎,花瓣下垂 */
+.flower--dry .petal--top    { background: #C8A990; transform: scale(0.85) translateY(8%); }
+.flower--dry .petal--right  { background: #C8A990; transform: scale(0.85) translateX(-8%); }
+.flower--dry .petal--bottom { background: #C8A990; transform: scale(0.85); }
+.flower--dry .petal--left   { background: #C8A990; transform: scale(0.85) translateX(8%); }
+.flower--dry .flower-center { background: #B89A6F; }
+.flower--dry .flower-stem   { background: #8B7960; }
+
+/* 浇水后:鲜艳粉花 + 摆动 + 顶上一片小绿叶 */
+.flower--watered .flower-bloom {
+  animation: flower-bloom-grow 500ms ease-out;
+}
+@keyframes flower-bloom-grow {
+  0%   { transform: scale(0.8); }
+  60%  { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.flower-leaf {
+  position: absolute;
+  bottom: 30%;
+  right: 22%;
+  width: 16%;
+  height: 12%;
+  background: #5C8E3E;
+  border: 2rpx solid #2C2C2A;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(30deg);
+  box-sizing: border-box;
+}
+
+/* ============ 7d. 浇水水滴动画 ============ */
+.watering-effect {
+  position: absolute;
+  pointer-events: none;
+  z-index: 8;
+}
+.water-drop {
+  position: absolute;
+  font-size: 30rpx;
+  top: -8rpx;
+  left: 50%;
+  opacity: 0;
+}
+.drop-1 { animation: drop-fall 350ms ease-in 0ms forwards; transform: translateX(-50%); }
+.drop-2 { animation: drop-fall 350ms ease-in 80ms forwards; transform: translateX(-110%); }
+.drop-3 { animation: drop-fall 350ms ease-in 160ms forwards; transform: translateX(10%); }
+
+@keyframes drop-fall {
+  0%   { top: -8rpx; opacity: 0; }
+  20%  { opacity: 1; }
+  100% { top: 50%; opacity: 0.3; }
+}
+
 /* ============ 7. 物品(地上) ============ */
 .item-on-ground {
   position: absolute;
