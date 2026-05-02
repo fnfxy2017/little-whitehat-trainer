@@ -81,10 +81,27 @@
     class="item-on-ground item--{{it.type}} item--{{it.sprite}}"
     style="left: {{it.x * cellSize}}px; top: {{it.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
   >
-    <view wx:if="{{it.type === 'credential'}}" class="cred-card">
+    <!-- 红苹果(C2 等):红色圆球 + 棕色叶柄 + 高光 -->
+    <view wx:if="{{it.sprite === 'red_apple'}}" class="apple-shape">
+      <view class="apple-body"></view>
+      <view class="apple-stem"></view>
+      <view class="apple-leaf"></view>
+      <view class="apple-shine"></view>
+    </view>
+
+    <!-- 凭证卡(T4 借书卡):白色 ID 卡 -->
+    <view wx:elif="{{it.type === 'credential' && it.sprite === 'card'}}" class="cred-card">
       <text class="cred-card-emoji">🪪</text>
       <text class="cred-card-label">{{it.credentialType === 'library_card' ? '借书卡' : '凭证'}}</text>
     </view>
+
+    <!-- 通用 credential:白卡兜底 -->
+    <view wx:elif="{{it.type === 'credential'}}" class="cred-card">
+      <text class="cred-card-emoji">🪪</text>
+      <text class="cred-card-label">凭证</text>
+    </view>
+
+    <!-- 普通物品 -->
     <text wx:else class="item-icon">{{it.icon}}</text>
   </view>
 
@@ -97,7 +114,15 @@
            --tx: {{(takingItem.toX - takingItem.fromX) * cellSize}}px;
            --ty: {{(takingItem.toY - takingItem.fromY) * cellSize}}px;"
   >
-    <view class="taking-card">
+    <view wx:if="{{takingItem.sprite === 'red_apple'}}" class="taking-card taking-card--apple">
+      <view class="apple-shape">
+        <view class="apple-body"></view>
+        <view class="apple-stem"></view>
+        <view class="apple-leaf"></view>
+        <view class="apple-shine"></view>
+      </view>
+    </view>
+    <view wx:else class="taking-card">
       <text class="taking-emoji">{{takingItem.icon}}</text>
     </view>
   </view>
@@ -162,8 +187,13 @@
       <view class="wanwan-shirt"></view>
       <view class="wanwan-pants"></view>
       <!-- 手持物品 -->
-      <view wx:if="{{heldItemIcon}}" class="held-item">
-        <text>{{heldItemIcon}}</text>
+      <view wx:if="{{heldItemIcon}}" class="held-item held-item--{{heldItemSprite || 'generic'}}">
+        <view wx:if="{{heldItemSprite === 'red_apple'}}" class="apple-shape apple-shape--mini">
+          <view class="apple-body"></view>
+          <view class="apple-stem"></view>
+          <view class="apple-leaf"></view>
+        </view>
+        <text wx:else>{{heldItemIcon}}</text>
       </view>
     </view>
   </view>

@@ -62,6 +62,7 @@ Component({
     playerY: 0,
     stepDuration: 280,
     heldItemIcon: '',
+    heldItemSprite: '',
     groundItems: [],
     colorables: [],
     flowers: [],
@@ -277,6 +278,7 @@ Component({
         shelves: shelves,
         goal: goal,
         heldItemIcon: '',
+        heldItemSprite: '',
         wateringEffect: null,
         celebrating: false
       });
@@ -423,11 +425,12 @@ Component({
       this._items[id].x = this.data.playerX;
       this._items[id].y = this.data.playerY;
       this._holding = id;
-      // 更新渲染:groundItems 移除该物品 + 显示手持
-      const groundItems = this.data.groundItems.filter(g => g.id !== id);
+      const item = this._items[id];
+      const groundItems = this.data.groundItems.filter(function (g) { return g.id !== id; });
       this.setData({
-        groundItems,
-        heldItemIcon: ITEM_ICONS[this._items[id].sprite] || ITEM_ICONS.item
+        groundItems: groundItems,
+        heldItemIcon: ITEM_ICONS[item.sprite] || ITEM_ICONS.item,
+        heldItemSprite: item.sprite || ''
       });
     },
 
@@ -438,13 +441,19 @@ Component({
       it.heldBy = null;
       it.x = this.data.playerX;
       it.y = this.data.playerY;
-      // groundItems 加回
       const groundItems = this.data.groundItems.concat([{
-        id, x: it.x, y: it.y,
+        id: id, x: it.x, y: it.y,
+        sprite: it.sprite,
+        type: it.type || 'item',
+        credentialType: it.credentialType || null,
         icon: ITEM_ICONS[it.sprite] || ITEM_ICONS.item
       }]);
       this._holding = null;
-      this.setData({ groundItems: groundItems, heldItemIcon: '' });
+      this.setData({
+        groundItems: groundItems,
+        heldItemIcon: '',
+        heldItemSprite: ''
+      });
     },
 
     /**
@@ -484,6 +493,7 @@ Component({
           fromY: item.y,
           toX: this.data.playerX,
           toY: this.data.playerY,
+          sprite: item.sprite || '',
           icon: ITEM_ICONS[item.sprite] || ITEM_ICONS.item
         }
       });
@@ -500,6 +510,7 @@ Component({
         // 显示手持图标
         self.setData({
           heldItemIcon: ITEM_ICONS[item.sprite] || ITEM_ICONS.item,
+          heldItemSprite: item.sprite || '',
           takingItem: null
         });
         // 凭证拿到后,如果地图上有 credential_door 且需求匹配,标记解锁
