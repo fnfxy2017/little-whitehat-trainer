@@ -65,37 +65,36 @@ function render(ctx, canvasW, canvasH, state) {
 
   ctx.clearRect(0, 0, canvasW, canvasH);
 
-  // 1. 地板(暖米色 + 木纹细线暗示)
-  ctx.fillStyle = COLORS.cardWarm;
+  // 1. 整体底色(深米黄,代表"非地板区"基色)
+  ctx.fillStyle = COLORS.bgDeep;
   ctx.fillRect(offsetX, offsetY, cell * gridW, cell * gridH);
 
-  // 1b. 木纹横线(很淡)
-  ctx.strokeStyle = COLORS.ink;
-  ctx.globalAlpha = 0.06;
-  ctx.lineWidth = 1;
-  for (let i = 1; i < gridH; i++) {
-    const y = offsetY + i * cell + 0.5;
-    ctx.beginPath();
-    ctx.moveTo(offsetX, y);
-    ctx.lineTo(offsetX + cell * gridW, y);
-    ctx.stroke();
-  }
-  ctx.globalAlpha = 1;
+  // 2. 计算每个格子的可走性
+  const walkable = computeWalkableMap(map, gridW, gridH);
 
-  // 2. 网格线(再淡一档,帮助孩子数格子)
-  ctx.strokeStyle = COLORS.ink;
-  ctx.globalAlpha = 0.10;
-  ctx.lineWidth = 1;
-  for (let i = 1; i < gridW; i++) {
-    const x = offsetX + i * cell + 0.5;
-    ctx.beginPath();
-    ctx.moveTo(x, offsetY);
-    ctx.lineTo(x, offsetY + cell * gridH);
-    ctx.stroke();
+  // 3. 画可走格(每格独立的浅色"地板贴片",带淡描边)
+  const tilePad = Math.max(2, Math.floor(cell * 0.04));
+  for (let y = 0; y < gridH; y++) {
+    for (let x = 0; x < gridW; x++) {
+      if (!walkable[y][x]) continue;
+      const tx = offsetX + x * cell + tilePad;
+      const ty = offsetY + y * cell + tilePad;
+      const tw = cell - tilePad * 2;
+      const th = cell - tilePad * 2;
+      // 米黄底
+      ctx.fillStyle = COLORS.cardWarm;
+      roundRect(ctx, tx, ty, tw, th, 6);
+      ctx.fill();
+      // 淡描边(让格子之间有分界感)
+      ctx.strokeStyle = COLORS.ink;
+      ctx.globalAlpha = 0.18;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.globalAlpha = 1;
+    }
   }
-  ctx.globalAlpha = 1;
 
-  // 3. 墙(深色块 + 内边亮线,强调"是墙不是地")
+  // 4. 墙(实心黑块 + 砖纹,占满整格不留间隙)
   for (const wall of map.walls || []) {
     const wx = offsetX + wall.x * cell;
     const wy = offsetY + wall.y * cell;
@@ -117,30 +116,60 @@ function render(ctx, canvasW, canvasH, state) {
     ctx.globalAlpha = 1;
   }
 
-  // 4. 装饰物(地毯)— 必须先画,在家具下面
+  // 5. 装饰物(地毯)— 画在地板格上面
   for (const obj of map.objects || []) {
     if (obj.decorative) drawDecorative(ctx, obj, offsetX, offsetY, cell);
   }
 
-  // 5. 家具
+  // 6. 家具
   for (const obj of map.objects || []) {
     if (!obj.decorative) drawObject(ctx, obj, offsetX, offsetY, cell);
   }
 
-  // 6. 终点(门)
+  // 7. 终点(门)— 在可走格上,用朱砂橙凸显
   if (state.goal) {
     drawDoor(ctx, state.goal, offsetX, offsetY, cell);
   }
 
-  // 7. 婉婉
+  // 8. 婉婉
   drawWanwan(ctx, state.player, offsetX, offsetY, cell);
 
-  // 8. 整体外圈描边(玩具立体)
+  // 9. 整体外圈描边
   ctx.strokeStyle = COLORS.ink;
   ctx.lineWidth = 4;
   ctx.lineJoin = 'round';
   roundRect(ctx, offsetX + 1, offsetY + 1, cell * gridW - 2, cell * gridH - 2, 10);
   ctx.stroke();
+}
+
+/**
+ * 算出每个格子的可走性 — 与 grid.js 的 isWalkable 一致
+ */
+function computeWalkableMap(map, gridW, gridH) {
+  const grid = [];
+  for (let y = 0; y < gridH; y++) {
+    grid.push(new Array(gridW).fill(true));
+  }
+  // 墙
+  for (const wall of map.walls || []) {
+    for (let y = wall.y; y < wall.y + wall.h; y++) {
+      for (let x = wall.x; x < wall.x + wall.w; x++) {
+        if (y >= 0 && y < gridH && x >= 0 && x < gridW) grid[y][x] = false;
+      }
+    }
+  }
+  // 家具(decorative 不挡)
+  for (const obj of map.objects || []) {
+    if (obj.decorative) continue;
+    const [ox, oy] = obj.pos;
+    const [ow, oh] = obj.size || [1, 1];
+    for (let y = oy; y < oy + oh; y++) {
+      for (let x = ox; x < ox + ow; x++) {
+        if (y >= 0 && y < gridH && x >= 0 && x < gridW) grid[y][x] = false;
+      }
+    }
+  }
+  return grid;
 }
 
 // ===== 装饰物(地毯)=====
