@@ -126,20 +126,42 @@ function render(ctx, canvasW, canvasH, state, celebrationT) {
     if (!obj.decorative) drawObject(ctx, obj, offsetX, offsetY, cell);
   }
 
-  // 7. 终点(门)— 在可走格上,用朱砂橙凸显
+  // 7. 终点(门 / 目标区)
   if (state.goal) {
-    drawDoor(ctx, state.goal, offsetX, offsetY, cell);
+    drawGoal(ctx, state.goal, offsetX, offsetY, cell);
   }
 
-  // 8. 婉婉
+  // 8. NPC(妈妈、弟弟等)
+  if (state.npcs) {
+    for (const npc of state.npcs) {
+      drawNPC(ctx, npc, offsetX, offsetY, cell);
+    }
+  }
+
+  // 9. 地上的物品(没被拿着的)
+  if (state.items) {
+    for (const id of Object.keys(state.items)) {
+      const it = state.items[id];
+      if (it.heldBy) continue;       // 在玩家手里的不在这里画,跟着玩家走
+      drawItem(ctx, it, offsetX, offsetY, cell);
+    }
+  }
+
+  // 10. 婉婉
   drawWanwan(ctx, state.player, offsetX, offsetY, cell, celebrationT);
+
+  // 10b. 玩家手上拿着的物品(画在玩家上方,头顶)
+  if (state.items && state.player.holding) {
+    const held = state.items[state.player.holding];
+    if (held) drawHeldItem(ctx, state.player, held, offsetX, offsetY, cell);
+  }
 
   // 庆祝时:婉婉头顶撒花瓣
   if (celebrationT != null && celebrationT > 0) {
     drawCelebrationPetals(ctx, state.player, offsetX, offsetY, cell, celebrationT);
   }
 
-  // 9. 整体外圈描边
+  // 11. 整体外圈描边
   ctx.strokeStyle = COLORS.ink;
   ctx.lineWidth = 4;
   ctx.lineJoin = 'round';
@@ -449,16 +471,32 @@ function drawPlant(ctx, px, py, w, h, cell) {
   });
 }
 
-// ===== 门(终点)=====
-function drawDoor(ctx, goal, offsetX, offsetY, cell) {
+// ===== 终点(门 / 目标区)=====
+function drawGoal(ctx, goal, offsetX, offsetY, cell) {
   const px = offsetX + goal.x * cell;
   const py = offsetY + goal.y * cell;
   const pad = 4;
 
-  // 门框(黑色描边大圆角)
-  strokedRoundRect(ctx, px + pad, py + pad, cell - 2 * pad, cell - 2 * pad, 10, COLORS.action, 4);
+  if (goal.type === 'goal_zone') {
+    // 目标区:虚线朱砂橙圆角框 + 中心地标
+    ctx.strokeStyle = COLORS.action;
+    ctx.lineWidth = 4;
+    ctx.setLineDash([8, 5]);
+    roundRect(ctx, px + pad, py + pad, cell - 2 * pad, cell - 2 * pad, 10);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    // 中心朱砂橙圆点
+    ctx.fillStyle = COLORS.action;
+    ctx.globalAlpha = 0.4;
+    ctx.beginPath();
+    ctx.arc(px + cell / 2, py + cell / 2, cell * 0.18, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalAlpha = 1;
+    return;
+  }
 
-  // 门内的板纹(竖直 2 条)
+  // 默认:门
+  strokedRoundRect(ctx, px + pad, py + pad, cell - 2 * pad, cell - 2 * pad, 10, COLORS.action, 4);
   ctx.strokeStyle = COLORS.ink;
   ctx.lineWidth = 2;
   ctx.lineCap = 'round';
@@ -468,14 +506,116 @@ function drawDoor(ctx, goal, offsetX, offsetY, cell) {
   ctx.moveTo(px + cell * 0.62, py + pad + 8);
   ctx.lineTo(px + cell * 0.62, py + cell - pad - 8);
   ctx.stroke();
-
-  // 门把手(白色小圆)
   strokedCircle(ctx, px + cell * 0.78, py + cell * 0.5, cell * 0.06, '#FFFFFF', 2);
-
-  // 上方"出口"指示带
   ctx.fillStyle = COLORS.ink;
   ctx.fillRect(px + pad + 4, py + pad + 4, cell - 2 * pad - 8, 6);
 }
+
+// ===== NPC(其他角色:妈妈、弟弟等)=====
+// 简化绘制:圆头身体 + 大眼睛 + 微笑,顶上装饰物区分身份
+function drawNPC(ctx, npc, offsetX, offsetY, cell) {
+  const cellLeft = offsetX + npc.x * cell;
+  const cellTop = offsetY + npc.y * cell;
+  const cx = cellLeft + cell / 2;
+  const totalH = cell * 0.85;
+  const top = cellTop + cell * 0.07;
+  const totalW = cell * 0.55;
+
+  const headR = totalH * 0.32;
+  const headCy = top + headR;
+  const bodyTop = headCy + headR * 0.85;
+  const bodyW = totalW * 0.85;
+  const bodyH = totalH * 0.50;
+
+  // NPC 主色(根据 type 决定)
+  const color = NPC_COLORS[npc.type] || COLORS.cardPale;
+
+  // 身体(圆角矩形)
+  strokedRoundRect(ctx, cx - bodyW / 2, bodyTop, bodyW, bodyH, 10, color, 3);
+  // 头(圆)
+  strokedCircle(ctx, cx, headCy, headR, color, 3);
+
+  // 类型装饰(简单标记)
+  if (npc.type === 'shuimu') {
+    // 水母妹妹:粉色水滴发饰
+    ctx.fillStyle = COLORS.cheek;
+    ctx.beginPath();
+    ctx.arc(cx, headCy - headR * 0.6, headR * 0.30, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = COLORS.ink;
+    ctx.lineWidth = 2.5;
+    ctx.stroke();
+  } else if (npc.type === 'durple') {
+    // 德普勒(弟弟):紫色尖刺角
+    ctx.fillStyle = '#A569BD';
+    ctx.strokeStyle = COLORS.ink;
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(cx - headR * 0.5, headCy - headR * 0.7);
+    ctx.lineTo(cx, headCy - headR * 1.2);
+    ctx.lineTo(cx + headR * 0.5, headCy - headR * 0.7);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  // 困困脸:半闭眯眯眼 + 小嘴
+  ctx.fillStyle = COLORS.ink;
+  ctx.beginPath();
+  ctx.ellipse(cx - headR * 0.32, headCy + headR * 0.05, headR * 0.12, headR * 0.06, 0, 0, Math.PI * 2);
+  ctx.ellipse(cx + headR * 0.32, headCy + headR * 0.05, headR * 0.12, headR * 0.06, 0, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.strokeStyle = COLORS.ink;
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.beginPath();
+  ctx.arc(cx, headCy + headR * 0.32, headR * 0.13, 0.18 * Math.PI, 0.82 * Math.PI);
+  ctx.stroke();
+}
+
+const NPC_COLORS = {
+  shuimu: '#FFC0CB',  // 水母妹妹·粉
+  durple: '#D7BDE2',  // 德普勒·淡紫
+  // 其他 NPC 渐进添加
+};
+
+// ===== 物品(地上的)=====
+function drawItem(ctx, item, offsetX, offsetY, cell) {
+  if (item.x == null || item.y == null) return;
+  const cx = offsetX + item.x * cell + cell / 2;
+  const cy = offsetY + item.y * cell + cell / 2;
+  drawItemAt(ctx, item, cx, cy, cell);
+}
+
+function drawHeldItem(ctx, player, item, offsetX, offsetY, cell) {
+  // 画在玩家头顶上方
+  const cx = offsetX + player.x * cell + cell / 2;
+  const cy = offsetY + player.y * cell + cell * 0.05;  // 头顶
+  drawItemAt(ctx, item, cx, cy, cell, 0.7);  // 缩小一点
+}
+
+function drawItemAt(ctx, item, cx, cy, cell, scale = 1) {
+  const sprite = item.sprite || item.id;
+  // 简单的物品贴图:奶油黄圆角小卡片 + emoji 标识
+  const w = cell * 0.45 * scale;
+  const h = cell * 0.45 * scale;
+  strokedRoundRect(ctx, cx - w / 2, cy - h / 2, w, h, 6, '#FFFFFF', 2.5);
+  // 物品图标 emoji
+  const emoji = ITEM_EMOJI[sprite] || '🎁';
+  ctx.font = `${Math.floor(cell * 0.30 * scale)}px sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillStyle = COLORS.ink;
+  ctx.fillText(emoji, cx, cy + 2);
+}
+
+const ITEM_EMOJI = {
+  breakfast: '🍳',
+  letter:    '✉',
+  key:       '🔑',
+  book:      '📖',
+  card:      '🪪'
+};
 
 // ===== 婉婉(主角,3 头身儿童)=====
 // 严格约束:整体所有元素必须在 cell × 0.92 范围内,不超出格子

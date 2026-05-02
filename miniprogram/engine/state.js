@@ -1,44 +1,75 @@
 // engine/state.js · 关卡运行时状态
-// 一关的完整状态:实体位置、命令队列、对话指针、提示等级、计时
 
 function createState(levelData) {
   const player = levelData.entities.find(e => e.id === 'player');
   const goal = levelData.entities.find(e => e.goal);
 
+  // 收集所有可拾取的物品(pickupable),记录在世界中的位置和"被谁拿着"
+  const items = {};
+  for (const e of levelData.entities) {
+    if (e.pickupable || e.type === 'item') {
+      items[e.id] = {
+        id: e.id,
+        sprite: e.sprite || e.type || 'item',
+        x: e.pos ? e.pos[0] : null,
+        y: e.pos ? e.pos[1] : null,
+        heldBy: null    // 'player' 时表示在玩家手里
+      };
+    }
+  }
+
+  // 收集所有 NPC(非 player、非 goal、非 item),供渲染使用
+  const npcs = [];
+  for (const e of levelData.entities) {
+    if (e.id === 'player') continue;
+    if (e.goal) continue;
+    if (e.pickupable || e.type === 'item') continue;
+    npcs.push({
+      id: e.id,
+      type: e.type,
+      x: e.pos ? e.pos[0] : 0,
+      y: e.pos ? e.pos[1] : 0,
+      facing: e.facing || 'down'
+    });
+  }
+
   return {
-    // 关卡静态信息
     level: levelData,
     levelId: levelData.id,
 
-    // 玩家位置(可变)
     player: {
       x: player.start_pos[0],
       y: player.start_pos[1],
-      facing: player.facing || 'down'
+      facing: player.facing || 'down',
+      holding: null   // 拿着的 item id
     },
 
-    // 终点(只读)
-    goal: goal ? { x: goal.pos[0], y: goal.pos[1], type: goal.type } : null,
+    // 终点 — 兼容 T1 的 goal entity 和 T2 的 goal_zone
+    goal: goal ? {
+      x: goal.pos[0],
+      y: goal.pos[1],
+      type: goal.type,
+      requiresItem: goal.requires_item || null,
+      goalId: goal.id || 'goal'
+    } : null,
 
-    // 命令队列 [{ cardId, dir, steps, action }]
+    // 物品和 NPC 状态
+    items,
+    npcs,
+
+    // 命令队列
     queue: [],
 
-    // 当前阶段:'intro_dialog' / 'playing' / 'executing' / 'cleared' / 'failed'
     phase: 'intro_dialog',
-
-    // 对话指针(用于 intro / on_clear)
     dialogIndex: 0,
     dialogList: levelData.intro_dialog || [],
 
-    // 提示状态
-    hintLevel: 0,                    // 0 = 未点提示;1/2/3 = 已展开第几级
-    hintLockUntil: Date.now() + 3 * 60 * 1000, // 3 分钟全局锁
+    hintLevel: 0,
+    hintLockUntil: Date.now() + 3 * 60 * 1000,
 
-    // 执行状态
-    executionStep: 0,                // 当前执行到队列第几条
-    executionAnim: null,             // 当前动画的中间帧数据
+    executionStep: 0,
+    executionAnim: null,
 
-    // 通关后提示数据
     clearedAt: null
   };
 }

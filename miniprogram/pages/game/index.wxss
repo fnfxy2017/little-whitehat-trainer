@@ -609,6 +609,7 @@
   text-align: center;
   width: 100%;
   max-width: 560rpx;
+  margin: 0 auto;
 }
 
 .failed-text {

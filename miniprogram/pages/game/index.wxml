@@ -128,13 +128,15 @@
 
   <!-- 失败提示 -->
   <view wx:if="{{phase === 'failed'}}" class="failed-overlay">
-    <view class="failed-card">
-      <view class="failed-text">{{failMessage}}</view>
-      <view class="failed-actions">
-        <view class="failed-btn-secondary" bindtap="onContinueEditing">继续调整</view>
-        <view class="failed-btn-primary" bindtap="onReset">重新开始</view>
+    <scroll-view scroll-y class="cleared-scroll">
+      <view class="failed-card">
+        <view class="failed-text">{{failMessage}}</view>
+        <view class="failed-actions">
+          <view class="failed-btn-secondary" bindtap="onContinueEditing">继续调整</view>
+          <view class="failed-btn-primary" bindtap="onReset">重新开始</view>
+        </view>
       </view>
-    </view>
+    </scroll-view>
   </view>
 
   <!-- 步数选择面板 -->

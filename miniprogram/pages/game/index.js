@@ -27,6 +27,8 @@ const CMD_ICON = {
   arrow_right: '→',
   pickup:      '📦',
   drop:        '📤',
+  hand_grab:   '📦',  // T2 等关卡的捡起图标
+  hand_drop:   '📤',  // T2 等关卡的放下图标
   set_color:   '🎨',
   take_credential: '🔑',
   water:       '💧',
@@ -197,7 +199,7 @@ Page({
     return rawCards.map(c => ({
       id: c.id,
       label: c.label,
-      iconText: CMD_ICON[c.icon] || c.icon || '?',
+      iconText: CMD_ICON[c.icon] || CMD_ICON[c.action] || '·',  // 降级到 action 图标,再降级到中点
       action: c.action,
       dir: c.dir,
       stepsInput: c.steps_input || false,
