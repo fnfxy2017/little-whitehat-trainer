@@ -66,7 +66,12 @@ Page({
     hintCountdown: '3:00',
 
     // 失败
-    failMessage: ''
+    failMessage: '',
+
+    // 步数选择面板
+    showStepPicker: false,
+    pickerCard: null,
+    pickerSteps: []
   },
 
   onLoad(options) {
@@ -275,23 +280,26 @@ Page({
     if (!card) return;
 
     if (card.stepsInput) {
-      // 弹步数选择(用 actionSheet 或自定义)
-      this._promptStepsAndPush(card);
+      // 弹自定义步数选择面板
+      this.setData({
+        showStepPicker: true,
+        pickerCard: card,
+        pickerSteps: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      });
     } else {
       this._pushCommand(card, 1);
     }
   },
 
-  _promptStepsAndPush(card) {
-    // 用 wx.showActionSheet 让用户选 1-9 步
-    const steps = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
-    wx.showActionSheet({
-      itemList: steps.map(s => `${card.label} ${s} 步`),
-      success: (res) => {
-        const n = parseInt(steps[res.tapIndex], 10);
-        this._pushCommand(card, n);
-      }
-    });
+  onPickSteps(e) {
+    const n = parseInt(e.currentTarget.dataset.n, 10);
+    const card = this.data.pickerCard;
+    if (card) this._pushCommand(card, n);
+    this.setData({ showStepPicker: false, pickerCard: null });
+  },
+
+  onCancelPicker() {
+    this.setData({ showStepPicker: false, pickerCard: null });
   },
 
   _pushCommand(card, steps) {

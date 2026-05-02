@@ -119,4 +119,22 @@
     </view>
   </view>
 
+  <!-- 步数选择面板 -->
+  <view wx:if="{{showStepPicker}}" class="picker-overlay" bindtap="onCancelPicker">
+    <view class="picker-card" catchtap="">
+      <view class="picker-title">{{pickerCard.label}} 几步?</view>
+      <view class="picker-grid">
+        <view
+          wx:for="{{pickerSteps}}"
+          wx:for-item="n"
+          wx:key="*this"
+          class="picker-cell"
+          bindtap="onPickSteps"
+          data-n="{{n}}"
+        >{{n}}</view>
+      </view>
+      <view class="picker-cancel" bindtap="onCancelPicker">取消</view>
+    </view>
+  </view>
+
 </view>
