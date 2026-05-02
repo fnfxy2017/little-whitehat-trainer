@@ -1,0 +1,74 @@
+/* pages/levels/index.wxss · 选关页样式(占位骨架) */
+
+.page {
+  min-height: 100vh;
+  padding: 80rpx 40rpx 40rpx;
+}
+
+.title {
+  font-size: var(--fs-xl);
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 12rpx;
+}
+
+.subtitle {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-mute);
+  margin-bottom: 60rpx;
+}
+
+.status-card {
+  background: var(--card-warm);
+  border: var(--stroke-thick) solid var(--ink);
+  border-radius: var(--r-lg);
+  box-shadow: 4rpx 4rpx 0 0 var(--ink);
+  padding: 40rpx 32rpx;
+  margin-bottom: 40rpx;
+}
+
+.status-text {
+  font-size: var(--fs-section);
+  font-weight: 800;
+  color: var(--action);
+  margin-bottom: 24rpx;
+}
+
+.status-meta {
+  font-size: var(--fs-md);
+  font-weight: 600;
+  color: var(--text-mute);
+  margin-bottom: 12rpx;
+}
+
+.list-card {
+  padding: 32rpx;
+  margin-bottom: 60rpx;
+}
+
+.list-title {
+  font-size: var(--fs-md);
+  font-weight: 800;
+  margin-bottom: 16rpx;
+}
+
+.list-item {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-mute);
+  padding: 8rpx 0;
+}
+
+.test-output {
+  margin-top: 32rpx;
+  padding: 24rpx;
+  background: var(--card-pale);
+  border: var(--stroke-thin) solid var(--ink);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-mute);
+  white-space: pre-wrap;
+}

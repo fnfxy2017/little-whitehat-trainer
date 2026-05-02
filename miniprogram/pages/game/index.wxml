@@ -1,0 +1,12 @@
+<!--pages/game/index.wxml · 主游戏页占位骨架-->
+<view class="page">
+  <view class="title">G1 · 大邮筒</view>
+  <view class="subtitle">第七幕 · 看不见的钥匙</view>
+
+  <view class="card placeholder">
+    <view class="placeholder-text">阶段 4 后这里会是 Canvas 地图</view>
+    <view class="placeholder-meta">当前关卡 ID: {{levelId}}</view>
+  </view>
+
+  <view class="action-btn" bindtap="onBack">‹ 返回选关</view>
+</view>

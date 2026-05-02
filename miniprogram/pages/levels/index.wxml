@@ -1,0 +1,22 @@
+<!--pages/levels/index.wxml · 选关页占位骨架(阶段 1 完成后会被阶段 5 重写)-->
+<view class="page">
+  <view class="title">白帽小队训练营</view>
+  <view class="subtitle">婉婉的冒险 · 七幕完结</view>
+
+  <view class="status-card">
+    <view class="status-text">阶段 1 脚手架完成 ✓</view>
+    <view class="status-meta">已加载 {{levelCount}} 个关卡</view>
+    <view class="status-meta">已通关 {{cleared}} / {{levelCount}}</view>
+  </view>
+
+  <view class="card list-card">
+    <view class="list-title">下一步</view>
+    <view class="list-item">阶段 3:剥离引擎逻辑</view>
+    <view class="list-item">阶段 4:Canvas 渲染层</view>
+    <view class="list-item">阶段 5:WXML 选关 / 游戏页</view>
+  </view>
+
+  <view class="action-btn" bindtap="onTestStorage">▶ 测试存档</view>
+
+  <view wx:if="{{lastTestResult}}" class="test-output">{{lastTestResult}}</view>
+</view>

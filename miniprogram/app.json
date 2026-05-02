@@ -1,0 +1,54 @@
+{
+  "pages": [
+    "pages/levels/index",
+    "pages/game/index"
+  ],
+  "subpackages": [
+    {
+      "root": "subpkgs/act2",
+      "name": "act2",
+      "pages": []
+    },
+    {
+      "root": "subpkgs/act3",
+      "name": "act3",
+      "pages": []
+    },
+    {
+      "root": "subpkgs/act4",
+      "name": "act4",
+      "pages": []
+    },
+    {
+      "root": "subpkgs/act5",
+      "name": "act5",
+      "pages": []
+    },
+    {
+      "root": "subpkgs/act6",
+      "name": "act6",
+      "pages": []
+    },
+    {
+      "root": "subpkgs/act7",
+      "name": "act7",
+      "pages": []
+    }
+  ],
+  "preloadRule": {
+    "pages/levels/index": {
+      "network": "wifi",
+      "packages": ["act2", "act3"]
+    }
+  },
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#FFE9B8",
+    "navigationBarTitleText": "白帽小队训练营",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#FFE9B8"
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents"
+}

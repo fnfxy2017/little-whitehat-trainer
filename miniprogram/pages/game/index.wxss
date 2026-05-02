@@ -1,0 +1,43 @@
+/* pages/game/index.wxss · 主游戏页(占位骨架) */
+
+.page {
+  min-height: 100vh;
+  padding: 80rpx 40rpx 40rpx;
+}
+
+.title {
+  font-size: var(--fs-xl);
+  font-weight: 900;
+  text-align: center;
+  margin-bottom: 12rpx;
+}
+
+.subtitle {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  text-align: center;
+  color: var(--text-mute);
+  margin-bottom: 60rpx;
+}
+
+.placeholder {
+  height: 600rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 60rpx;
+}
+
+.placeholder-text {
+  font-size: var(--fs-md);
+  font-weight: 700;
+  color: var(--text-mute);
+  margin-bottom: 16rpx;
+}
+
+.placeholder-meta {
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text-faint);
+}

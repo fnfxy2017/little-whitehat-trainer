@@ -1,0 +1,66 @@
+{
+  "description": "白帽小队训练营 · 婉婉的冒险(微信小程序版)",
+  "miniprogramRoot": "miniprogram/",
+  "compileType": "miniprogram",
+  "libVersion": "3.0.0",
+  "packOptions": {
+    "ignore": [
+      { "type": "folder", "value": "scripts" },
+      { "type": "folder", "value": ".claude" },
+      { "type": "folder", "value": "tests" },
+      { "type": "folder", "value": "assets/_prompts" },
+      { "type": "file", "value": "README.md" },
+      { "type": "file", "value": ".gitignore" },
+      { "type": "file", "value": "C2-红钥匙不见了.png" },
+      { "type": "folder", "value": "levels" },
+      { "type": "file", "value": "game.js" },
+      { "type": "file", "value": "index.html" },
+      { "type": "file", "value": "levels.html" }
+    ]
+  },
+  "setting": {
+    "urlCheck": true,
+    "es6": true,
+    "enhance": true,
+    "postcss": false,
+    "preloadBackgroundData": false,
+    "minified": true,
+    "newFeature": true,
+    "coverView": true,
+    "nodeModules": false,
+    "autoAudits": false,
+    "showShadowRootInWxmlPanel": true,
+    "scopeDataCheck": false,
+    "uglifyFileName": false,
+    "checkInvalidKey": true,
+    "checkSiteMap": true,
+    "uploadWithSourceMap": true,
+    "compileHotReLoad": false,
+    "lazyloadPlaceholderEnable": false,
+    "useMultiFrameRuntime": true,
+    "useApiHook": true,
+    "useApiHostProcess": true,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    },
+    "enableEngineNative": false,
+    "useIsolateContext": true,
+    "userConfirmedBundleSwitch": false,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "disableUseStrict": false,
+    "minifyWXML": true,
+    "showES6CompileOption": false,
+    "useCompilerPlugins": false
+  },
+  "appid": "touristappid",
+  "projectname": "wanwan-whitehat-trainer-wechat",
+  "condition": {},
+  "editorSetting": {
+    "tabIndent": "insertSpaces",
+    "tabSize": 2
+  }
+}

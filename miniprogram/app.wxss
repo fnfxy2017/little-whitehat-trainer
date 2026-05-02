@@ -1,0 +1,109 @@
+/* app.wxss - 全局样式 · v7.2 设计系统
+   严格 3 色:米黄系 3 档 + 墨黑 + 朱砂橙
+   全部颜色值定义在 page 上,以 CSS 变量形式被所有页面/组件引用 */
+
+page {
+  /* 米黄系 · 4 档明度 */
+  --bg-deep:    #F5DEB3;
+  --bg-light:   #FFE9B8;
+  --card-warm:  #FFF1C9;
+  --card-pale:  #FFFCF2;
+  /* 墨黑 */
+  --ink:        #2C2C2A;
+  /* 朱砂橙 */
+  --action:     #FF6B47;
+  /* 次要灰阶(只用于次要文字,不用于色块) */
+  --text-mute:  #5F5E5A;
+  --text-faint: #888780;
+
+  /* 字号阶梯(@1280 设计稿基准,小程序里用 rpx) */
+  --fs-huge:    92rpx;
+  --fs-xl:      76rpx;
+  --fs-lg:      56rpx;
+  --fs-section: 48rpx;
+  --fs-body-lg: 46rpx;
+  --fs-body:    40rpx;
+  --fs-md:      36rpx;
+  --fs-sm:      32rpx;
+  --fs-meta:    28rpx;
+  --fs-tiny:    26rpx;
+
+  /* 圆角阶梯 */
+  --r-pill:     110rpx;
+  --r-lg:       40rpx;
+  --r-md:       24rpx;
+  --r-sm:       16rpx;
+
+  /* 描边(玩具立体感的核心) */
+  --stroke-thick: 6rpx;
+  --stroke:       5rpx;
+  --stroke-thin:  4rpx;
+  --stroke-hair:  2rpx;
+
+  /* 默认字体族 */
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang SC",
+               "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+
+  /* 渐层暖背景 + 圆点纹理 */
+  background-color: var(--bg-light);
+  background-image:
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-light) 100%),
+    radial-gradient(circle, rgba(44, 44, 42, 0.08) 1.5rpx, transparent 1.5rpx);
+  background-size: 100% 100%, 60rpx 60rpx;
+  background-attachment: fixed;
+}
+
+/* 通用 · 卡片(玩具立体感)
+   用法:<view class="card">...</view> */
+.card {
+  background: var(--card-warm);
+  border: var(--stroke) solid var(--ink);
+  border-radius: var(--r-md);
+  box-shadow: 4rpx 4rpx 0 0 var(--ink);
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+}
+
+.card.--pale {
+  background: var(--card-pale);
+}
+
+.card.--ink {
+  background: var(--ink);
+  color: var(--bg-light);
+}
+
+.card:active {
+  transform: translate(2rpx, 2rpx);
+  box-shadow: 2rpx 2rpx 0 0 var(--ink);
+}
+
+/* 通用 · 主行动按钮(执行)
+   用法:<view class="action-btn">执行</view> */
+.action-btn {
+  background: var(--action);
+  border: var(--stroke-thick) solid var(--ink);
+  border-radius: var(--r-pill);
+  box-shadow: 4rpx 4rpx 0 0 var(--ink);
+  color: #FFFFFF;
+  font-size: var(--fs-huge);
+  font-weight: 900;
+  text-align: center;
+  padding: 50rpx 0;
+  transition: transform 0.08s ease-out, box-shadow 0.08s ease-out;
+}
+
+.action-btn:active {
+  transform: translate(2rpx, 2rpx);
+  box-shadow: 2rpx 2rpx 0 0 var(--ink);
+}
+
+/* 通用 · 文字(防漏全局基线) */
+view, text {
+  color: var(--ink);
+  box-sizing: border-box;
+}
+
+/* 通用 · 不显示某些占位元素时使用 */
+.--hidden {
+  display: none;
+}
