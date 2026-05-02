@@ -516,6 +516,44 @@
   box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
 }
 
+.failed-actions {
+  display: flex;
+  gap: 16rpx;
+  justify-content: center;
+}
+
+.failed-btn-primary {
+  background: #FF6B47;
+  border: 4rpx solid #2C2C2A;
+  border-radius: 40rpx;
+  color: #FFFFFF;
+  font-size: 28rpx;
+  font-weight: 800;
+  padding: 16rpx 28rpx;
+  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
+}
+
+.failed-btn-primary:active {
+  transform: translate(2rpx, 2rpx);
+  box-shadow: 2rpx 2rpx 0 0 #2C2C2A;
+}
+
+.failed-btn-secondary {
+  background: #FFF1C9;
+  border: 4rpx solid #2C2C2A;
+  border-radius: 40rpx;
+  color: #2C2C2A;
+  font-size: 28rpx;
+  font-weight: 800;
+  padding: 16rpx 28rpx;
+  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
+}
+
+.failed-btn-secondary:active {
+  transform: translate(2rpx, 2rpx);
+  box-shadow: 2rpx 2rpx 0 0 #2C2C2A;
+}
+
 /* ============ 步数选择面板(底部抽屉式)============ */
 .picker-overlay {
   position: fixed;

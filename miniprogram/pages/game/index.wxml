@@ -115,7 +115,10 @@
   <view wx:if="{{phase === 'failed'}}" class="failed-overlay">
     <view class="failed-card">
       <view class="failed-text">{{failMessage}}</view>
-      <view class="failed-btn" bindtap="onReset">再试一次</view>
+      <view class="failed-actions">
+        <view class="failed-btn-secondary" bindtap="onContinueEditing">继续调整</view>
+        <view class="failed-btn-primary" bindtap="onReset">重新开始</view>
+      </view>
     </view>
   </view>
 

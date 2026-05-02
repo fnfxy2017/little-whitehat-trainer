@@ -336,6 +336,22 @@ Page({
   // 重来 + 执行
   // =========================================================================
 
+  /**
+   * 失败后"继续调整":婉婉保持在当前位置,队列清空让玩家继续输入下一段
+   * 不重置游戏状态
+   */
+  onContinueEditing() {
+    this._state.phase = 'playing';
+    queueMod.clearQueue(this._state);
+    this.setData({
+      phase: 'playing',
+      queue: [],
+      queueStepCount: 0,
+      failMessage: ''
+    });
+    this._redraw();
+  },
+
   onReset() {
     // 重新初始化状态(保留对话进度,只重置玩家位置 + 队列 + 失败状态)
     const data = this._state.level;
