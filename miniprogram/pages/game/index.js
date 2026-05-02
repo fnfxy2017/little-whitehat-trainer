@@ -372,15 +372,13 @@ Page({
 
   _runAtoms(atoms, i) {
     if (i >= atoms.length) {
-      // 全部执行完,看是否过关
       if (executor.checkSuccess(this._state)) {
         this._handleClear();
       } else {
-        // 没到终点
         this._state.phase = 'failed';
         this.setData({
           phase: 'failed',
-          failMessage: '没走到门口,再试试'
+          failMessage: '没到门口呢,看看路线再试试'
         });
       }
       return;
@@ -390,18 +388,19 @@ Page({
     const r = executor.execAtom(this._state, atom);
 
     if (!r.ok) {
-      // 失败(撞墙)
+      // 真正的失败(未知动作等),罕见
       this._state.phase = 'failed';
       this.setData({
         phase: 'failed',
-        failMessage: r.message || '走不通,再试试'
+        failMessage: r.message || '出错了,再试试'
       });
       return;
     }
 
+    // r.blocked 表示撞墙,但 ok=true,继续执行
+    // (不再弹失败弹窗,孩子能自然感知"这步走不通")
     this._redraw();
 
-    // 250ms 间隔,跑下一个
     this._execTimer = setTimeout(() => {
       this._runAtoms(atoms, i + 1);
     }, 250);

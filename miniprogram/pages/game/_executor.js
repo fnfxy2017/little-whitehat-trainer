@@ -23,7 +23,7 @@ function expandQueue(state) {
 
 /**
  * 执行一个原子动作,返回 { ok, blocked, message }
- * 失败时不修改 state
+ * 撞墙不算失败,只是这一步走不动,继续执行队列后面的指令
  */
 function execAtom(state, atom) {
   if (atom.action === 'move') {
@@ -32,9 +32,12 @@ function execAtom(state, atom) {
       state.player.x = r.newX;
       state.player.y = r.newY;
       state.player.facing = atom.dir;
-      return { ok: true };
+      return { ok: true, blocked: false };
     } else {
-      return { ok: false, blocked: true, message: '撞墙了' };
+      // 撞墙:不修改位置,但返回 ok=true,blocked=true
+      // 这样执行流程继续往下走,只是这一步原地踏步
+      state.player.facing = atom.dir;  // 朝向更新
+      return { ok: true, blocked: true };
     }
   }
   return { ok: false, message: `未知动作: ${atom.action}` };
