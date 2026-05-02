@@ -1,0 +1,344 @@
+/* components/wa-stage/wa-stage.wxss · DOM 舞台 · v7.2 严格 5 色 */
+
+.stage {
+  position: relative;
+  background: #2C2C2A;
+  border: 5rpx solid #2C2C2A;
+  border-radius: 20rpx;
+  box-shadow: 6rpx 6rpx 0 0 #2C2C2A;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+/* ============ 1. 地板格 ============ */
+.cell {
+  position: absolute;
+  box-sizing: border-box;
+}
+.cell--floor {
+  background: #FFF1C9;
+  border: 1rpx solid rgba(44, 44, 42, 0.15);
+  border-radius: 4rpx;
+  margin: 2rpx;
+  width: calc(100% - 4rpx);
+}
+
+/* ============ 2. 墙 ============ */
+.wall {
+  position: absolute;
+  background: #2C2C2A;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 4rpx 0;
+  box-sizing: border-box;
+}
+.wall-stripe {
+  height: 1rpx;
+  background: #FFE9B8;
+  opacity: 0.25;
+  margin: 0 4rpx;
+}
+
+/* ============ 3. 装饰物 ============ */
+.decorative {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 14rpx;
+}
+.decorative--rug {
+  background: #FF6B47;
+  opacity: 0.28;
+  border: 2rpx dashed #FF6B47;
+}
+
+/* ============ 4. 家具 ============ */
+.furniture {
+  position: absolute;
+  box-sizing: border-box;
+  background: #FFFCF2;
+  border: 4rpx solid #2C2C2A;
+  border-radius: 12rpx;
+  box-shadow: 3rpx 3rpx 0 0 #2C2C2A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.furniture-icon {
+  font-size: 38rpx;
+  font-weight: 800;
+}
+
+.furniture--bed { background: #FFFFFF; }
+.furniture--desk { background: #FFFCF2; }
+.furniture--lamp,
+.furniture--plant,
+.furniture--stove,
+.furniture--table { background: #FFFCF2; }
+.furniture--window { background: #D9F0FF; }
+.furniture--tv { background: #FFFFFF; }
+
+/* ============ 5. 目标 ============ */
+.goal {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5;
+}
+.goal--door {
+  background: #FF6B47;
+  border: 4rpx solid #2C2C2A;
+  box-shadow: 3rpx 3rpx 0 0 #2C2C2A;
+}
+.goal--zone {
+  border: 4rpx dashed #FF6B47;
+  background: rgba(255, 107, 71, 0.18);
+}
+.goal-icon {
+  font-size: 36rpx;
+  color: #FFFFFF;
+}
+.goal--zone .goal-icon {
+  color: #FF6B47;
+  font-size: 30rpx;
+}
+
+/* ============ 6. NPC ============ */
+.npc {
+  position: absolute;
+  box-sizing: border-box;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  margin: 4rpx;
+  width: calc(100% - 8rpx);
+  height: calc(100% - 8rpx);
+}
+.npc--shuimu,
+.npc--mom { background: #FFC0CB; }
+.npc--durple,
+.npc--brother { background: #D7BDE2; }
+.npc--raddy { background: #FFB6B0; }
+.npc--lime { background: #B6E5B0; }
+.npc-face {
+  font-size: 32rpx;
+}
+
+/* ============ 7. 物品(地上) ============ */
+.item-on-ground {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 7;
+}
+.item-icon {
+  font-size: 40rpx;
+  background: #FFFFFF;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 12rpx;
+  width: 60rpx;
+  height: 60rpx;
+  line-height: 54rpx;
+  text-align: center;
+  box-shadow: 2rpx 2rpx 0 0 #2C2C2A;
+}
+
+/* ============ 8. 婉婉 ============ */
+.wanwan {
+  position: absolute;
+  z-index: 10;
+  /* transform 由 inline style 控制 */
+}
+.wanwan-body {
+  position: relative;
+  width: 70%;
+  height: 88%;
+  margin: 6% auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* 帽子 */
+.wanwan-cap {
+  width: 84%;
+  height: 28%;
+  background: #FFFFFF;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50% 50% 30% 30%;
+  position: relative;
+}
+.wanwan-cap::after {
+  /* 帽舌 */
+  content: '';
+  position: absolute;
+  right: -28%;
+  top: 60%;
+  width: 38%;
+  height: 30%;
+  background: #FFFFFF;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 0 50% 50% 0;
+}
+.wanwan-cap-heart {
+  position: absolute;
+  top: 4%;
+  left: 50%;
+  transform: translateX(-50%);
+  color: #FF6B9D;
+  font-size: 26rpx;
+  font-weight: 900;
+  z-index: 2;
+}
+
+/* 脸 */
+.wanwan-face {
+  width: 76%;
+  height: 32%;
+  background: #FDE3C3;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 50%;
+  position: relative;
+  margin-top: -8%;
+}
+.eye {
+  position: absolute;
+  top: 32%;
+  width: 14%;
+  height: 26%;
+  background: #2C2C2A;
+  border-radius: 50%;
+}
+.eye--l { left: 22%; }
+.eye--r { right: 22%; }
+.mouth {
+  position: absolute;
+  bottom: 22%;
+  left: 35%;
+  width: 30%;
+  height: 18%;
+  border: 3rpx solid #2C2C2A;
+  border-top: none;
+  border-radius: 0 0 100% 100%;
+}
+
+/* 衣服 */
+.wanwan-shirt {
+  width: 80%;
+  height: 22%;
+  background: #FFFFFF;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 14rpx 14rpx 4rpx 4rpx;
+  margin-top: 0;
+}
+.wanwan-pants {
+  width: 70%;
+  height: 18%;
+  background: #3498DB;
+  border: 3rpx solid #2C2C2A;
+  border-top: none;
+  border-radius: 0 0 10rpx 10rpx;
+}
+
+/* 手持物品 */
+.held-item {
+  position: absolute;
+  top: -8%;
+  right: -10%;
+  width: 38%;
+  height: 38%;
+  background: #FFFFFF;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 8rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26rpx;
+  z-index: 11;
+}
+
+/* ============ 婉婉庆祝姿势 ============ */
+.wanwan--celebrate .wanwan-body {
+  animation: wanwan-jump 600ms ease-out;
+}
+@keyframes wanwan-jump {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-18rpx); }
+  100% { transform: translateY(0); }
+}
+
+/* ============ 9. 信号灯 ============ */
+.traffic-light {
+  position: absolute;
+  background: #3D3D3D;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 8rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  padding: 4rpx 0;
+  z-index: 5;
+  margin: 8rpx;
+  width: 60%;
+  height: 84%;
+}
+.light {
+  width: 30%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #5C5C5C;
+  border: 2rpx solid #2C2C2A;
+}
+.light--lit.light--red { background: #E74C3C; }
+.light--lit.light--yellow { background: #F1C40F; }
+.light--lit.light--green { background: #27AE60; }
+
+/* ============ 10. 庆祝特效 ============ */
+.celebrate-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.celebrate-burst {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50%;
+  background: #FF6B47;
+  opacity: 0.5;
+  animation: burst 800ms ease-out forwards;
+}
+@keyframes burst {
+  0% { transform: scale(0.3); opacity: 0.7; }
+  100% { transform: scale(8); opacity: 0; }
+}
+
+.petal {
+  position: absolute;
+  font-size: 36rpx;
+  color: #FF6B47;
+  opacity: 0;
+}
+.petal-1 { animation: petal1 700ms ease-out forwards; }
+.petal-2 { animation: petal2 700ms ease-out forwards; }
+.petal-3 { animation: petal3 700ms ease-out forwards; }
+.petal-4 { animation: petal4 700ms ease-out forwards; }
+.petal-5 { animation: petal5 700ms ease-out forwards; }
+.petal-6 { animation: petal6 700ms ease-out forwards; }
+@keyframes petal1 { 0%{transform:translate(0,0) scale(0);opacity:0} 30%{opacity:1} 100%{transform:translate(-160rpx,-120rpx) scale(0.4) rotate(120deg);opacity:0} }
+@keyframes petal2 { 0%{transform:translate(0,0) scale(0);opacity:0} 30%{opacity:1} 100%{transform:translate(160rpx,-120rpx) scale(0.4) rotate(-120deg);opacity:0} }
+@keyframes petal3 { 0%{transform:translate(0,0) scale(0);opacity:0} 30%{opacity:1} 100%{transform:translate(-200rpx,40rpx) scale(0.4) rotate(80deg);opacity:0} }
+@keyframes petal4 { 0%{transform:translate(0,0) scale(0);opacity:0} 30%{opacity:1} 100%{transform:translate(200rpx,40rpx) scale(0.4) rotate(-80deg);opacity:0} }
+@keyframes petal5 { 0%{transform:translate(0,0) scale(0);opacity:0} 30%{opacity:1} 100%{transform:translate(-100rpx,160rpx) scale(0.4) rotate(40deg);opacity:0} }
+@keyframes petal6 { 0%{transform:translate(0,0) scale(0);opacity:0} 30%{opacity:1} 100%{transform:translate(100rpx,160rpx) scale(0.4) rotate(-40deg);opacity:0} }

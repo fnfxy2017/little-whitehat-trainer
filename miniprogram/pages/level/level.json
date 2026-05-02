@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "",
+  "navigationBarBackgroundColor": "#FFE9B8",
+  "renderer": "skyline",
+  "componentFramework": "glass-easel",
+  "usingComponents": {
+    "intro-dialog": "/components/intro-dialog/intro-dialog",
+    "wa-stage": "/components/wa-stage/wa-stage"
+  }
+}

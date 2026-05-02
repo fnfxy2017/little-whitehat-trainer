@@ -38,12 +38,23 @@ function adapt(raw) {
     }
   }
 
-  // NPCs(非 player / goal / item 的所有 entity)
+  // NPCs(非 player / goal / item / 可染色实体 的所有 entity)
   const npcs = [];
+  const colorables = {};
   for (const e of raw.entities || []) {
     if (e.id === 'player') continue;
-    if (e.goal) continue;
     if (e.pickupable || e.type === 'item') continue;
+    if (e.type === 'traffic_light') {
+      colorables[e.id] = {
+        id: e.id,
+        type: e.type,
+        x: e.pos[0],
+        y: e.pos[1],
+        required: e.required_sequence || []
+      };
+      continue;
+    }
+    if (e.goal) continue;
     npcs.push({
       id: e.id,
       type: e.type,
@@ -87,6 +98,7 @@ function adapt(raw) {
     },
     items,
     npcs,
+    colorables,
     goal: goalEntity ? {
       type: goalEntity.type,
       x: goalEntity.pos ? goalEntity.pos[0] : null,

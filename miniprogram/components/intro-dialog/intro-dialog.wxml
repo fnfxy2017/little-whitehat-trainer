@@ -1,0 +1,35 @@
+<!-- intro-dialog.wxml · 介绍对白弹窗 · DOM only,无 Canvas -->
+<view wx:if="{{visible}}" class="mask" catchtap="onTapMask">
+  <view class="dialog" catchtap="onTapDialog">
+    <!-- 角色头像区 -->
+    <view class="avatar avatar--{{currentSpeaker}}">
+      <text class="avatar-text">{{avatarLabel}}</text>
+    </view>
+
+    <!-- 气泡 -->
+    <view class="bubble">
+      <view class="bubble-name">{{speakerName}}</view>
+      <view class="bubble-text">{{currentText}}<text wx:if="{{typing}}" class="caret">▍</text></view>
+
+      <view class="bubble-actions">
+        <view class="skip-btn tap-press" catchtap="onSkip">跳过 »</view>
+        <view class="next-btn tap-press" catchtap="onNext">
+          <text wx:if="{{typing}}">▶ 跳过</text>
+          <text wx:elif="{{isLast}}">开始</text>
+          <text wx:else>下一句</text>
+        </view>
+      </view>
+
+      <!-- 进度点 -->
+      <view class="progress-dots">
+        <view
+          wx:for="{{dialogs}}"
+          wx:for-item="_d"
+          wx:for-index="i"
+          wx:key="i"
+          class="dot {{i === currentIndex ? 'dot--active' : (i < currentIndex ? 'dot--done' : 'dot--pending')}}"
+        ></view>
+      </view>
+    </view>
+  </view>
+</view>

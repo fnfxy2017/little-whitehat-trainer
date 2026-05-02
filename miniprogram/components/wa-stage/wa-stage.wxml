@@ -1,0 +1,120 @@
+<!-- wa-stage.wxml · 婉婉舞台 · 方案 A:纯 DOM + transform -->
+<view class="stage" style="width: {{stageW}}px; height: {{stageH}}px;">
+
+  <!-- 1. 地板格(可走) -->
+  <view
+    wx:for="{{walkables}}"
+    wx:for-item="cell"
+    wx:key="key"
+    class="cell cell--floor"
+    style="left: {{cell.x * cellSize}}px; top: {{cell.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
+  ></view>
+
+  <!-- 2. 墙(黑色砖块) -->
+  <view
+    wx:for="{{walls}}"
+    wx:for-item="w"
+    wx:key="key"
+    class="wall"
+    style="left: {{w.x * cellSize}}px; top: {{w.y * cellSize}}px; width: {{w.w * cellSize}}px; height: {{w.h * cellSize}}px;"
+  >
+    <view class="wall-stripe" wx:for="{{w.stripeCount}}" wx:for-item="_s" wx:key="*this"></view>
+  </view>
+
+  <!-- 3. 装饰物(地毯) -->
+  <view
+    wx:for="{{decoratives}}"
+    wx:for-item="d"
+    wx:key="key"
+    class="decorative decorative--{{d.type}}"
+    style="left: {{d.x * cellSize}}px; top: {{d.y * cellSize}}px; width: {{d.w * cellSize}}px; height: {{d.h * cellSize}}px;"
+  ></view>
+
+  <!-- 4. 家具 -->
+  <view
+    wx:for="{{furniture}}"
+    wx:for-item="f"
+    wx:key="key"
+    class="furniture furniture--{{f.type}}"
+    style="left: {{f.x * cellSize}}px; top: {{f.y * cellSize}}px; width: {{f.w * cellSize}}px; height: {{f.h * cellSize}}px;"
+  >
+    <text class="furniture-icon">{{f.icon}}</text>
+  </view>
+
+  <!-- 5. 目标(门 / 目标区) -->
+  <view
+    wx:if="{{goal}}"
+    class="goal goal--{{goal.kind}}"
+    style="left: {{goal.x * cellSize}}px; top: {{goal.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
+  >
+    <text class="goal-icon">{{goal.icon}}</text>
+  </view>
+
+  <!-- 6. NPCs -->
+  <view
+    wx:for="{{npcs}}"
+    wx:for-item="n"
+    wx:key="id"
+    class="npc npc--{{n.type}}"
+    style="left: {{n.x * cellSize}}px; top: {{n.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
+  >
+    <text class="npc-face">{{n.face}}</text>
+  </view>
+
+  <!-- 7. 物品(地上) -->
+  <view
+    wx:for="{{groundItems}}"
+    wx:for-item="it"
+    wx:key="id"
+    class="item-on-ground"
+    style="left: {{it.x * cellSize}}px; top: {{it.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
+  >
+    <text class="item-icon">{{it.icon}}</text>
+  </view>
+
+  <!-- 8. 婉婉 -->
+  <view
+    class="wanwan {{celebrating ? 'wanwan--celebrate' : ''}}"
+    style="width: {{cellSize}}px; height: {{cellSize}}px; transform: translate({{playerX * cellSize}}px, {{playerY * cellSize}}px); transition: transform {{stepDuration}}ms ease-out;"
+  >
+    <view class="wanwan-body">
+      <view class="wanwan-cap"></view>
+      <view class="wanwan-cap-heart">♥</view>
+      <view class="wanwan-face">
+        <view class="eye eye--l"></view>
+        <view class="eye eye--r"></view>
+        <view class="mouth"></view>
+      </view>
+      <view class="wanwan-shirt"></view>
+      <view class="wanwan-pants"></view>
+      <!-- 手持物品 -->
+      <view wx:if="{{heldItemIcon}}" class="held-item">
+        <text>{{heldItemIcon}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 9. 信号灯(可染色) -->
+  <view
+    wx:for="{{colorables}}"
+    wx:for-item="cl"
+    wx:key="id"
+    class="traffic-light"
+    style="left: {{cl.x * cellSize}}px; top: {{cl.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
+  >
+    <view class="light light--red {{cl.litRed ? 'light--lit' : ''}}"></view>
+    <view class="light light--yellow {{cl.litYellow ? 'light--lit' : ''}}"></view>
+    <view class="light light--green {{cl.litGreen ? 'light--lit' : ''}}"></view>
+  </view>
+
+  <!-- 10. 通关庆祝粒子(纯 CSS 动画) -->
+  <view wx:if="{{celebrating}}" class="celebrate-overlay">
+    <view class="celebrate-burst"></view>
+    <view class="petal petal-1">✦</view>
+    <view class="petal petal-2">✦</view>
+    <view class="petal petal-3">✦</view>
+    <view class="petal petal-4">✦</view>
+    <view class="petal petal-5">✦</view>
+    <view class="petal petal-6">✦</view>
+  </view>
+</view>

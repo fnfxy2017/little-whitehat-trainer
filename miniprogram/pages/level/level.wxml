@@ -1,0 +1,134 @@
+<!-- pages/level/level.wxml · 关卡主页 · DOM 优先 -->
+<view class="level-page" wx:if="{{level}}">
+
+  <!-- 顶栏 -->
+  <view class="topbar">
+    <view class="back-btn tap-press" bindtap="onBack">‹ 返回</view>
+    <view class="title-block">
+      <text class="title">{{level.id}} · {{level.title}}</text>
+      <text class="chapter">第 {{level.act}} 幕 · {{level.chapter}}</text>
+    </view>
+    <view class="step-counter">{{stepCount}} 步</view>
+  </view>
+
+  <!-- 婉婉舞台 -->
+  <view class="stage-wrap">
+    <wa-stage
+      id="stage"
+      level-data="{{level}}"
+    />
+  </view>
+
+  <!-- 介绍对白(每次进入都重播) -->
+  <intro-dialog
+    dialogs="{{introDialogs}}"
+    bindfinish="onIntroFinish"
+  />
+
+  <!-- 概念关:卡片栏空时显示 manual_tip -->
+  <view wx:if="{{!introVisible && level.cards.length === 0 && level.manualTip}}" class="manual-tip">
+    💡 {{level.manualTip}}
+  </view>
+
+  <!-- 队列展示 -->
+  <view wx:if="{{!introVisible}}" class="queue-area">
+    <view class="queue-header">
+      <text class="queue-label">队列</text>
+      <text class="queue-count">{{queue.length}} 条</text>
+      <view wx:if="{{queue.length > 0 && !running}}" class="queue-clear tap-press" bindtap="onClearQueue">清空</view>
+    </view>
+    <scroll-view scroll-x class="queue-list" wx:if="{{queue.length > 0}}">
+      <view
+        wx:for="{{queue}}"
+        wx:for-item="q"
+        wx:key="key"
+        class="queue-item {{q.locked ? 'queue-item--locked' : ''}}"
+        bindtap="onTapQueueItem"
+        data-index="{{index}}"
+      >
+        <text class="queue-icon">{{q.icon}}</text>
+        <text class="queue-label-text">{{q.label}}</text>
+      </view>
+    </scroll-view>
+    <view wx:else class="queue-empty">
+      <text>{{level.cards.length > 0 ? '点下面的卡片加进来' : '等待预设指令'}}</text>
+    </view>
+  </view>
+
+  <!-- 卡片栏 -->
+  <view wx:if="{{!introVisible && level.cards.length > 0}}" class="card-tray">
+    <view
+      wx:for="{{level.cards}}"
+      wx:for-item="c"
+      wx:key="id"
+      class="card tap-press"
+      bindtap="onTapCard"
+      data-id="{{c.id}}"
+    >
+      <text class="card-icon">{{c.iconText}}</text>
+      <text class="card-label">{{c.label}}</text>
+    </view>
+  </view>
+
+  <!-- 步数选择(底部抽屉) -->
+  <view wx:if="{{showStepPicker}}" class="step-picker-overlay" bindtap="onCancelStepPicker">
+    <view class="step-picker-card" catchtap="">
+      <view class="step-picker-title">{{stepPickerLabel}} 几步?</view>
+      <view class="step-picker-grid">
+        <view
+          wx:for="{{[1,2,3,4,5,6,7,8,9]}}"
+          wx:for-item="n"
+          wx:key="*this"
+          class="step-cell tap-press"
+          bindtap="onPickSteps"
+          data-n="{{n}}"
+        >{{n}}</view>
+      </view>
+      <view class="step-picker-cancel" bindtap="onCancelStepPicker">取消</view>
+    </view>
+  </view>
+
+  <!-- 控制按钮 -->
+  <view wx:if="{{!introVisible}}" class="controls">
+    <view class="btn btn-secondary tap-press" bindtap="onRetry">↻ 重来</view>
+    <view
+      class="btn btn-primary tap-press {{(running || queue.length === 0) ? 'btn--disabled' : ''}}"
+      bindtap="onRunQueue"
+    >▶ 执行</view>
+  </view>
+
+  <!-- 结果弹窗(通关 / 失败统一) -->
+  <view wx:if="{{showResult}}" class="result-overlay">
+    <view class="result-card">
+      <view class="result-emoji">{{resultIsClear ? '🏆' : '🤔'}}</view>
+      <view class="result-title">{{resultIsClear ? '过关!' : '没到终点'}}</view>
+      <view wx:if="{{resultIsClear}}" class="result-meta">用了 {{stepCount}} 步</view>
+
+      <view wx:if="{{resultIsClear && level.securityConcept && level.securityConcept.name}}" class="concept-card">
+        <view class="concept-name">{{level.securityConcept.name}}</view>
+        <view wx:if="{{level.securityConcept.real_analogy}}" class="concept-row">
+          <text class="concept-label">现实里就像</text>
+          <text class="concept-text">{{level.securityConcept.real_analogy}}</text>
+        </view>
+        <view wx:if="{{level.securityConcept.defense_tip}}" class="concept-row">
+          <text class="concept-label">怎么防</text>
+          <text class="concept-text">{{level.securityConcept.defense_tip}}</text>
+        </view>
+      </view>
+
+      <view wx:if="{{resultIsClear && resultDialog}}" class="result-dialog">
+        <text class="result-dialog-speaker">{{resultDialog.speaker}}</text>
+        <text class="result-dialog-text">{{resultDialog.text}}</text>
+      </view>
+
+      <view class="result-actions">
+        <view wx:if="{{!resultIsClear}}" class="btn btn-secondary tap-press" bindtap="onContinueEditing">继续调整</view>
+        <view wx:if="{{!resultIsClear}}" class="btn btn-primary tap-press" bindtap="onRetry">重新开始</view>
+
+        <view wx:if="{{resultIsClear && resultDialogHasNext}}" class="btn btn-secondary tap-press" bindtap="onResultDialogNext">下一句</view>
+        <view wx:if="{{resultIsClear && !resultDialogHasNext}}" class="btn btn-primary tap-press" bindtap="onBackOrNext">{{nextLevelId ? '下一关' : '返回选关'}}</view>
+      </view>
+    </view>
+  </view>
+
+</view>

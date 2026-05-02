@@ -1,0 +1,124 @@
+/* components/intro-dialog/intro-dialog.wxss */
+
+.mask {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(44, 44, 42, 0.55);
+  z-index: 200;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 0 28rpx 56rpx;
+  box-sizing: border-box;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 680rpx;
+  display: flex;
+  align-items: flex-end;
+  gap: 14rpx;
+}
+
+/* 头像 */
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 50%;
+  border: 5rpx solid #2C2C2A;
+  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-bottom: 6rpx;
+}
+.avatar--wa { background: #FFF1C9; }
+.avatar--system,
+.avatar--xiaotian { background: #FF6B47; }
+.avatar--captain { background: #FFFCF2; }
+.avatar-text {
+  font-size: 32rpx;
+  font-weight: 900;
+  color: #2C2C2A;
+}
+.avatar--system .avatar-text,
+.avatar--xiaotian .avatar-text { color: #FFFFFF; }
+
+/* 气泡 */
+.bubble {
+  flex: 1;
+  background: #FFFCF2;
+  border: 5rpx solid #2C2C2A;
+  border-radius: 28rpx;
+  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
+  padding: 20rpx 22rpx 16rpx;
+  position: relative;
+}
+
+.bubble-name {
+  font-size: 22rpx;
+  font-weight: 800;
+  color: #FF6B47;
+  margin-bottom: 6rpx;
+}
+
+.bubble-text {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2C2C2A;
+  line-height: 1.4;
+  min-height: 88rpx;
+}
+
+.caret {
+  display: inline-block;
+  color: #FF6B47;
+  margin-left: 4rpx;
+  animation: blink 800ms infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.bubble-actions {
+  margin-top: 16rpx;
+  display: flex;
+  gap: 12rpx;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.skip-btn {
+  font-size: 22rpx;
+  font-weight: 700;
+  color: #888780;
+  padding: 8rpx 16rpx;
+}
+
+.next-btn {
+  background: #FF6B47;
+  color: #FFFFFF;
+  font-size: 26rpx;
+  font-weight: 800;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  border: 3rpx solid #2C2C2A;
+  box-shadow: 3rpx 3rpx 0 0 #2C2C2A;
+}
+
+.progress-dots {
+  margin-top: 14rpx;
+  display: flex;
+  gap: 8rpx;
+}
+.dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+  border: 2rpx solid #2C2C2A;
+}
+.dot--pending { background: #FFE9B8; }
+.dot--active { background: #FF6B47; }
+.dot--done { background: #2C2C2A; }
