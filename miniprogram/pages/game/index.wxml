@@ -1,12 +1,122 @@
-<!--pages/game/index.wxml · 主游戏页占位骨架-->
+<!--pages/game/index.wxml · 主游戏页 · v7.2-->
 <view class="page">
-  <view class="title">G1 · 大邮筒</view>
-  <view class="subtitle">第七幕 · 看不见的钥匙</view>
 
-  <view class="card placeholder">
-    <view class="placeholder-text">阶段 4 后这里会是 Canvas 地图</view>
-    <view class="placeholder-meta">当前关卡 ID: {{levelId}}</view>
+  <!-- 顶部导航 -->
+  <view class="topbar">
+    <view class="back-btn" bindtap="onBack">‹ 返回</view>
+    <view class="topbar-title">
+      <view class="level-name">{{levelId}} · {{levelTitle}}</view>
+      <view wx:if="{{levelChapter}}" class="chapter-tag">第{{levelAct}}幕 · {{levelChapter}}</view>
+    </view>
+    <view class="hint-btn {{hintReady ? '' : '--locked'}}" bindtap="onTapHint">
+      <view class="hint-icon">💡</view>
+      <view wx:if="{{!hintReady}}" class="hint-timer">{{hintCountdown}}</view>
+    </view>
   </view>
 
-  <view class="action-btn" bindtap="onBack">‹ 返回选关</view>
+  <!-- Canvas 地图区 -->
+  <view class="map-wrap" style="height: {{mapHeight || 600}}rpx;">
+    <canvas
+      type="2d"
+      id="game-canvas"
+      class="game-canvas"
+    ></canvas>
+  </view>
+
+  <!-- 对话气泡(intro_dialog / on_clear_dialog 都用) -->
+  <view wx:if="{{currentDialog}}" class="dialog-card">
+    <view class="dialog-avatar">{{currentDialog.avatar}}</view>
+    <view class="dialog-content">
+      <view class="dialog-speaker">{{currentDialog.speaker}}</view>
+      <view class="dialog-text">{{currentDialog.text}}</view>
+    </view>
+    <view class="dialog-next" bindtap="onDialogNext">{{dialogIsLast ? '开始' : '下一句'}}</view>
+  </view>
+
+  <!-- 提示卡片(点了 💡 才出现) -->
+  <view wx:if="{{showHint}}" class="hint-card">
+    <view class="hint-card-title">提示 ({{hintLevel}}/3)</view>
+    <view class="hint-card-text">{{hintText}}</view>
+    <view wx:if="{{hintLevel < 3}}" class="hint-more" bindtap="onTapNextHint">还要更多提示</view>
+    <view class="hint-close" bindtap="onCloseHint">收起</view>
+  </view>
+
+  <!-- 指令栏 -->
+  <view wx:if="{{phase === 'playing'}}" class="cmd-section">
+    <view class="cmd-row">
+      <view class="cmd-title">指令</view>
+      <view class="cmd-tip">点一下加入队列</view>
+    </view>
+
+    <view class="cmd-grid">
+      <view
+        wx:for="{{commandCards}}"
+        wx:for-item="card"
+        wx:key="id"
+        class="cmd-card"
+        bindtap="onTapCmdCard"
+        data-id="{{card.id}}"
+      >
+        <view class="cmd-icon">{{card.iconText}}</view>
+        <view class="cmd-label">{{card.label}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 队列栏 -->
+  <view wx:if="{{phase === 'playing'}}" class="queue-section">
+    <view class="queue-row">
+      <view class="queue-title">队列</view>
+      <view class="queue-count">{{queueStepCount}} 步</view>
+      <view class="queue-clear {{queue.length > 0 ? '' : '--disabled'}}" bindtap="onClearQueue">清空</view>
+    </view>
+
+    <scroll-view scroll-x class="queue-scroll" wx:if="{{queue.length > 0}}">
+      <view class="queue-list">
+        <view
+          wx:for="{{queue}}"
+          wx:for-item="q"
+          wx:key="*this"
+          class="queue-item"
+          bindtap="onTapQueueItem"
+          data-index="{{index}}"
+        >
+          <view class="queue-item-text">{{q.label}}</view>
+        </view>
+      </view>
+    </scroll-view>
+    <view wx:else class="queue-empty">点上面的指令加进来</view>
+  </view>
+
+  <!-- 操作区:重来 + 执行 -->
+  <view wx:if="{{phase === 'playing'}}" class="action-row">
+    <view class="reset-btn" bindtap="onReset">↻</view>
+    <view class="exec-btn {{queue.length > 0 ? '' : '--disabled'}}" bindtap="onExecute">▶ 执行</view>
+  </view>
+
+  <!-- 通关弹窗 -->
+  <view wx:if="{{phase === 'cleared'}}" class="cleared-overlay">
+    <view class="cleared-card">
+      <view class="cleared-trophy">🏆</view>
+      <view class="cleared-title">过关!</view>
+      <view class="cleared-meta">用了 {{queueStepCount}} 步</view>
+      <view wx:if="{{currentDialog}}" class="cleared-dialog">
+        <view class="cleared-speaker">{{currentDialog.speaker}}</view>
+        <view class="cleared-text">{{currentDialog.text}}</view>
+      </view>
+      <view class="cleared-actions">
+        <view wx:if="{{currentDialog && !dialogIsLast}}" class="cleared-btn-secondary" bindtap="onDialogNext">下一句</view>
+        <view wx:else class="cleared-btn-primary" bindtap="onBack">返回选关</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 失败提示 -->
+  <view wx:if="{{phase === 'failed'}}" class="failed-overlay">
+    <view class="failed-card">
+      <view class="failed-text">{{failMessage}}</view>
+      <view class="failed-btn" bindtap="onReset">再试一次</view>
+    </view>
+  </view>
+
 </view>

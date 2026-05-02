@@ -149,6 +149,11 @@
   background: #FFFCF2;
 }
 
+.level-card.--cleared {
+  background: #FFFCF2;
+  border-color: #FF6B47;
+}
+
 .level-card.--playing {
   background: #2C2C2A;
 }
