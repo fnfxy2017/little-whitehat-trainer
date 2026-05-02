@@ -3,6 +3,8 @@
   <view class="title">白帽小队训练营</view>
   <view class="subtitle">婉婉的冒险 · 七幕完结</view>
 
+  <view wx:if="{{loadError}}" class="error-banner">⚠ {{loadError}}</view>
+
   <view class="status-card">
     <view class="status-text">阶段 1 脚手架完成 ✓</view>
     <view class="status-meta">已加载 {{levelCount}} 个关卡</view>

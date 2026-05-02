@@ -1,34 +1,52 @@
-// pages/levels/index.js · 选关页(阶段 1 占位骨架)
-const storage = require('../../utils/storage.js');
-const loader = require('../../utils/loader.js');
+// pages/levels/index.js · 选关页(健壮版,任何子模块挂掉都不白屏)
 
 Page({
   data: {
     levelCount: 0,
     cleared: 0,
-    lastTestResult: ''
+    lastTestResult: '',
+    loadError: ''
   },
 
   onLoad() {
-    // 加载主包内的关卡(第一幕 T1-T5 + C1-C3)
-    const list = loader.listMainPackLevels();
-    const progress = storage.getProgress();
-    const cleared = Object.values(progress).filter(p => p.cleared).length;
+    console.log('[levels] onLoad 开始');
 
-    this.setData({
-      levelCount: list.length,
-      cleared
-    });
+    let levelCount = 0;
+    let cleared = 0;
+    let loadError = '';
 
-    console.log('[levels] 已加载', list.length, '个主包关卡 ·', cleared, '已通关');
+    // 关卡加载(loader 内部 require .json 是潜在风险点)
+    try {
+      const loader = require('../../utils/loader.js');
+      const list = loader.listMainPackLevels();
+      levelCount = list.length;
+      console.log('[levels] loader OK · 关卡数:', levelCount);
+    } catch (e) {
+      console.error('[levels] loader 加载失败', e);
+      loadError = 'loader: ' + (e.message || String(e));
+    }
+
+    // 进度读取
+    try {
+      const storage = require('../../utils/storage.js');
+      const progress = storage.getProgress();
+      cleared = Object.values(progress).filter(p => p && p.cleared).length;
+      console.log('[levels] storage OK · 已通关:', cleared);
+    } catch (e) {
+      console.error('[levels] storage 加载失败', e);
+      loadError = (loadError ? loadError + ' · ' : '') + 'storage: ' + (e.message || String(e));
+    }
+
+    this.setData({ levelCount, cleared, loadError });
+    console.log('[levels] onLoad 完成');
   },
 
   onTestStorage() {
-    // 阶段 1 自检:写一条假进度,读出来,验证 storage 工具链能用
     const testKey = '__SCAFFOLD_TEST__';
     const testValue = { cleared: true, time: Date.now() };
 
     try {
+      const storage = require('../../utils/storage.js');
       storage.setLevelProgress(testKey, testValue);
       const readBack = storage.getLevelProgress(testKey);
       const ok = readBack && readBack.cleared === true;
@@ -39,11 +57,10 @@ Page({
           : '存档读写异常 ✗'
       });
 
-      // 测试完清掉,不污染真实进度
       storage.clearLevelProgress(testKey);
     } catch (e) {
       this.setData({
-        lastTestResult: '存档异常: ' + (e.message || e)
+        lastTestResult: '存档异常: ' + (e.message || String(e))
       });
     }
   }

@@ -1,26 +1,32 @@
-/* pages/game/index.wxss · 主游戏页(占位骨架) */
+/* pages/game/index.wxss · 主游戏页(无 CSS 变量版) */
 
 .page {
   min-height: 100vh;
   padding: 80rpx 40rpx 40rpx;
+  background-color: #FFE9B8;
 }
 
 .title {
-  font-size: var(--fs-xl);
-  font-weight: 900;
+  font-size: 56rpx;
+  font-weight: 800;
   text-align: center;
+  color: #2C2C2A;
   margin-bottom: 12rpx;
 }
 
 .subtitle {
-  font-size: var(--fs-sm);
+  font-size: 28rpx;
   font-weight: 600;
   text-align: center;
-  color: var(--text-mute);
+  color: #5F5E5A;
   margin-bottom: 60rpx;
 }
 
 .placeholder {
+  background: #FFF1C9;
+  border: 5rpx solid #2C2C2A;
+  border-radius: 24rpx;
+  box-shadow: 4rpx 4rpx 0 0 #2C2C2A;
   height: 600rpx;
   display: flex;
   flex-direction: column;
@@ -30,14 +36,14 @@
 }
 
 .placeholder-text {
-  font-size: var(--fs-md);
+  font-size: 30rpx;
   font-weight: 700;
-  color: var(--text-mute);
+  color: #5F5E5A;
   margin-bottom: 16rpx;
 }
 
 .placeholder-meta {
-  font-size: var(--fs-sm);
+  font-size: 26rpx;
   font-weight: 600;
-  color: var(--text-faint);
+  color: #888780;
 }
