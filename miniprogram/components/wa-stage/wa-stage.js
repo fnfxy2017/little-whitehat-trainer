@@ -14,6 +14,29 @@ const ITEM_ICONS = {
   card: '🪪', item: '🎁'
 };
 
+// 货架/物件 sprite → 中文名 + emoji
+const SHELF_LABELS = {
+  milk: '牛奶', ice_cream: '冰淇淋',
+  bread: '面包', apple: '苹果', juice: '果汁', cookie: '饼干',
+  book: '书', shelf: '货架',
+  // 场景物件
+  blocked_door: '门', info_stone: '石碑', safe_box: '保险箱',
+  mirror: '镜子', mailbox: '邮箱', gift_box: '礼物',
+  button: '按钮', virus_tile: '病毒', deploy_button: '部署',
+  fake_check_door: '检查门', color_gate: '色门', timed_gate: '定时门',
+  loop_npc: '循环者', reply_guard: '守门员'
+};
+const SHELF_EMOJI = {
+  milk: '🥛', ice_cream: '🍦',
+  bread: '🍞', apple: '🍎', juice: '🧃', cookie: '🍪',
+  book: '📚', shelf: '📦',
+  blocked_door: '🚪', info_stone: '🪨', safe_box: '🔒',
+  mirror: '🪞', mailbox: '📮', gift_box: '🎁',
+  button: '🔘', virus_tile: '☠', deploy_button: '🚀',
+  fake_check_door: '⚠', color_gate: '🚧', timed_gate: '⏱',
+  loop_npc: '🔁', reply_guard: '🛡'
+};
+
 Component({
   options: { multipleSlots: false },
 
@@ -41,10 +64,11 @@ Component({
     heldItemIcon: '',
     groundItems: [],
     colorables: [],
-    flowers: [],      // T5:[{ id, x, y, watered }]
+    flowers: [],
+    shelves: [],     // C1 等:[{ id, sprite, x, y, trap }]
     goal: null,
     takingItem: null,
-    wateringEffect: null,  // 浇水时的水滴动画 { x, y, key }
+    wateringEffect: null,
 
     celebrating: false
   },
@@ -199,6 +223,23 @@ Component({
         });
       }
 
+      // 货架 (C1 等)
+      const shelves = [];
+      this._shelves = {};
+      for (const id of Object.keys(level.shelves || {})) {
+        const s = level.shelves[id];
+        this._shelves[id] = {
+          id: id, x: s.x, y: s.y, sprite: s.sprite, trap: !!s.trap
+        };
+        shelves.push({
+          id: id, x: s.x, y: s.y,
+          sprite: s.sprite,
+          trap: !!s.trap,
+          label: SHELF_LABELS[s.sprite] || s.sprite,
+          emoji: SHELF_EMOJI[s.sprite] || '📦'
+        });
+      }
+
       // 目标
       let goal = null;
       if (level.goal) {
@@ -233,6 +274,7 @@ Component({
         groundItems: groundItems,
         colorables: colorables,
         flowers: flowers,
+        shelves: shelves,
         goal: goal,
         heldItemIcon: '',
         wateringEffect: null,

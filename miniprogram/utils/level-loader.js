@@ -7,6 +7,25 @@ const levelsModule = require('../data/levels/index.js');
 const LEVELS = levelsModule.LEVELS;
 const ORDER = levelsModule.ORDER;
 
+// 场景物件类型 — 这些不是 NPC 也不是道具,
+// 而是"地图上的固定装置",用统一的贴片渲染兜底
+const PROP_TYPES = {
+  blocked_door: true,    // 临时锁住的门(C5 D2 等)
+  info_stone: true,      // 信息石碑(D2-D8 多关)
+  safe_box: true,        // 保险箱
+  mirror: true,          // 镜子(C3 D4)
+  mailbox: true,         // 邮箱(G1 G11)
+  gift_box: true,        // 礼物盒
+  button: true,          // 按钮(E5 G7)
+  virus_tile: true,      // 病毒砖(E12 等)
+  deploy_button: true,   // 部署按钮(E10 E12 E7)
+  fake_check_door: true, // 假检查门(E10 E12 E7)
+  color_gate: true,      // 颜色门(C6 X5 X6)
+  timed_gate: true,      // 定时门(C9 X3 X6)
+  loop_npc: true,        // 循环 NPC(E11 E4)
+  reply_guard: true      // 回复守门员(E3)
+};
+
 /**
  * 加载关卡数据。levelId 形如 "T1" / "C1"
  * 返回 null 表示没找到
@@ -40,10 +59,11 @@ function adapt(raw) {
     }
   }
 
-  // NPCs(非 player / goal / item / 可染色实体 / 可浇灌目标)
+  // NPCs(非 player / goal / item / 可染色实体 / 可浇灌目标 / 货架)
   const npcs = [];
   const colorables = {};
-  const targets = {};  // T5 等可浇灌/交互目标(flower 等)
+  const targets = {};
+  const shelves = {};  // C1 等关卡的货架道具(milk / ice_cream 等)
   for (const e of raw.entities || []) {
     if (e.id === 'player') continue;
     if (e.pickupable || e.type === 'item' || e.type === 'credential') continue;
@@ -67,10 +87,39 @@ function adapt(raw) {
       };
       continue;
     }
+    if (e.type === 'shelf') {
+      shelves[e.id] = {
+        id: e.id,
+        sprite: e.sprite || 'shelf',
+        x: e.pos[0],
+        y: e.pos[1],
+        trap: !!e.trap,
+        label: e.label || ''
+      };
+      continue;
+    }
+    // 场景物件兜底:blocked_door / info_stone / safe_box / mirror /
+    // mailbox / gift_box / button / virus_tile / loop_npc / etc.
+    // 这些在多个 C/D/E 系列出现,用统一'贴片'渲染避免崩
+    if (PROP_TYPES[e.type]) {
+      shelves[e.id] = {
+        id: e.id,
+        sprite: e.type,         // 用 type 当 sprite,共享渲染
+        propType: e.type,
+        x: e.pos[0],
+        y: e.pos[1],
+        trap: !!e.trap,
+        label: e.label || ''
+      };
+      continue;
+    }
     if (e.goal) continue;
     npcs.push({
       id: e.id,
       type: e.type,
+      role: e.role || null,        // follower 等
+      follows: e.follows || null,
+      label: e.label || '',
       x: e.pos ? e.pos[0] : 0,
       y: e.pos ? e.pos[1] : 0
     });
@@ -97,7 +146,7 @@ function adapt(raw) {
     series: raw.id ? raw.id.charAt(0) : '?',
     introDialogs: raw.intro_dialog || [],     // 注意:JSON 字段是单数 intro_dialog
     onClearDialogs: raw.on_clear_dialog || [],
-    manualTip: raw.manual_tip || '',
+    manualTip: cleanHtmlToText(raw.manual_tip || ''),
     securityConcept: normalizeSecurityConcept(raw.security_concept),
     presetQueue: raw.preset_queue || null,
     cards,
@@ -115,6 +164,7 @@ function adapt(raw) {
     npcs,
     colorables,
     targets,
+    shelves,
     goal: goalEntity ? {
       type: goalEntity.type,
       id: goalEntity.id || 'goal',
@@ -138,6 +188,23 @@ function normalizeSecurityConcept(sc) {
     real_analogy: sc.real_analogy || sc.analogy || '',
     defense_tip: sc.defense_tip || sc.defense || ''
   };
+}
+
+/**
+ * 清洗 HTML 标签 → 纯文本
+ * <br> → 换行;<strong>x</strong> → x;其他标签直接去掉
+ * 关卡 JSON 里的 manual_tip 可能含 HTML 标签(网页版用),小程序 view 不渲染
+ */
+function cleanHtmlToText(html) {
+  if (!html) return '';
+  return String(html)
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/?(strong|b|em|i|u|span|p|div)[^>]*>/gi, '')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"');
 }
 
 module.exports = {

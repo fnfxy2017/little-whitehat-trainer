@@ -102,7 +102,19 @@
     </view>
   </view>
 
-  <!-- 7c. 花朵(T5)— 未浇水/已浇水两态 -->
+  <!-- 7c. 货架(C1) -->
+  <view
+    wx:for="{{shelves}}"
+    wx:for-item="sh"
+    wx:key="id"
+    class="shelf {{sh.trap ? 'shelf--trap' : ''}}"
+    style="left: {{sh.x * cellSize}}px; top: {{sh.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
+  >
+    <text class="shelf-emoji">{{sh.emoji}}</text>
+    <text class="shelf-label">{{sh.label}}</text>
+  </view>
+
+  <!-- 7d. 花朵(T5)— 未浇水/已浇水两态 -->
   <view
     wx:for="{{flowers}}"
     wx:for-item="fl"

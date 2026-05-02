@@ -62,11 +62,24 @@
   background: #FFFCF2;
   border: 4rpx dashed #FF6B47;
   border-radius: 16rpx;
-  padding: 16rpx 22rpx;
+  padding: 14rpx 20rpx;
   margin: 8rpx 0;
-  font-size: 26rpx;
+  display: flex;
+  align-items: flex-start;
+  gap: 8rpx;
+}
+.manual-tip-icon {
+  font-size: 28rpx;
+  line-height: 1.4;
+  flex-shrink: 0;
+}
+.manual-tip-text {
+  font-size: 24rpx;
   font-weight: 700;
   color: #2C2C2A;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  flex: 1;
 }
 
 /* ============ 队列 ============ */

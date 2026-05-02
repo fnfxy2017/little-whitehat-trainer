@@ -27,7 +27,8 @@
 
   <!-- 概念关:卡片栏空时显示 manual_tip -->
   <view wx:if="{{!introVisible && level.cards.length === 0 && level.manualTip}}" class="manual-tip">
-    💡 {{level.manualTip}}
+    <text class="manual-tip-icon">💡</text>
+    <text class="manual-tip-text" decode="{{true}}">{{level.manualTip}}</text>
   </view>
 
   <!-- 队列展示 -->

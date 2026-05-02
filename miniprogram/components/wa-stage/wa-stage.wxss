@@ -153,7 +153,41 @@
   z-index: 6;
 }
 
-/* ============ 7c. 花朵(T5) ============ */
+/* ============ 7c. 货架(C1) ============ */
+.shelf {
+  position: absolute;
+  z-index: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #FFFCF2;
+  border: 4rpx solid #2C2C2A;
+  border-radius: 10rpx;
+  box-shadow: 3rpx 3rpx 0 0 #2C2C2A;
+  margin: 4rpx;
+  width: calc(100% - 8rpx);
+  height: calc(100% - 8rpx);
+  box-sizing: border-box;
+}
+.shelf--trap {
+  border-color: #FF6B47;
+  border-style: dashed;
+  background: #FFE9B8;
+}
+.shelf-emoji {
+  font-size: 40rpx;
+  line-height: 1;
+}
+.shelf-label {
+  font-size: 16rpx;
+  font-weight: 800;
+  color: #2C2C2A;
+  margin-top: 2rpx;
+  letter-spacing: 1rpx;
+}
+
+/* ============ 7d. 花朵(T5) ============ */
 .flower {
   position: absolute;
   z-index: 7;

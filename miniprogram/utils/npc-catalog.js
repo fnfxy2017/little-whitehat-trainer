@@ -219,6 +219,16 @@ const NPC_CATALOG = {
     showBlush: false
   },
 
+  // 通用 NPC(C1 收银员等没具体身份的角色)
+  npc: {
+    label: 'NPC',
+    mainColor: '#E5C99E',
+    accentColor: '#8B5A3C',
+    decoration: 'bowler-hat',
+    mood: 'chill',
+    showBlush: false
+  },
+
   // ========================================
   // 兼容映射(关卡 JSON 用 mom/brother 等通用名 → 映射到具体角色)
   // ========================================
