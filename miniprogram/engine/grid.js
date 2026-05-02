@@ -9,6 +9,10 @@ const DIR_VEC = {
 
 /**
  * 检查格子是否可走
+ * 设计决策:只有墙挡路,家具不挡路
+ *  · 卧室关卡里婉婉就是要从床边走出去,家具挡路会让关卡无解
+ *  · 视觉上婉婉路过家具时,会暂时被家具图层覆盖一部分(无伤大雅)
+ *  · 后期如果某些关卡需要"撞家具失败"机制,可在 JSON 加 `solid: true` 标志
  */
 function isWalkable(state, x, y) {
   const map = state.level.map;
@@ -17,7 +21,7 @@ function isWalkable(state, x, y) {
   // 越界
   if (x < 0 || y < 0 || x >= w || y >= h) return false;
 
-  // 撞墙
+  // 撞墙(永远阻挡)
   for (const wall of map.walls || []) {
     if (x >= wall.x && x < wall.x + wall.w &&
         y >= wall.y && y < wall.y + wall.h) {
@@ -25,9 +29,9 @@ function isWalkable(state, x, y) {
     }
   }
 
-  // 撞家具(decorative 不挡路)
+  // 家具默认可走;仅当 obj.solid === true 时才阻挡
   for (const obj of map.objects || []) {
-    if (obj.decorative) continue;
+    if (!obj.solid) continue;
     const [ox, oy] = obj.pos;
     const [ow, oh] = obj.size || [1, 1];
     if (x >= ox && x < ox + ow && y >= oy && y < oy + oh) {

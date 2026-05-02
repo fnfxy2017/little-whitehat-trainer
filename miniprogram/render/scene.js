@@ -144,13 +144,13 @@ function render(ctx, canvasW, canvasH, state) {
 
 /**
  * 算出每个格子的可走性 — 与 grid.js 的 isWalkable 一致
+ * 墙永远阻挡;家具默认可走(只有 solid=true 才阻挡)
  */
 function computeWalkableMap(map, gridW, gridH) {
   const grid = [];
   for (let y = 0; y < gridH; y++) {
     grid.push(new Array(gridW).fill(true));
   }
-  // 墙
   for (const wall of map.walls || []) {
     for (let y = wall.y; y < wall.y + wall.h; y++) {
       for (let x = wall.x; x < wall.x + wall.w; x++) {
@@ -158,9 +158,8 @@ function computeWalkableMap(map, gridW, gridH) {
       }
     }
   }
-  // 家具(decorative 不挡)
   for (const obj of map.objects || []) {
-    if (obj.decorative) continue;
+    if (!obj.solid) continue;
     const [ox, oy] = obj.pos;
     const [ow, oh] = obj.size || [1, 1];
     for (let y = oy; y < oy + oh; y++) {
@@ -474,140 +473,151 @@ function drawDoor(ctx, goal, offsetX, offsetY, cell) {
 }
 
 // ===== 婉婉(主角,3 头身儿童)=====
+// 严格约束:整体所有元素必须在 cell × 0.92 范围内,不超出格子
 function drawWanwan(ctx, player, offsetX, offsetY, cell) {
-  const cx = offsetX + player.x * cell + cell / 2;
-  const cy = offsetY + player.y * cell + cell / 2;
+  // 格子的中心和有效绘图区
+  const cellLeft = offsetX + player.x * cell;
+  const cellTop = offsetY + player.y * cell;
+  const cx = cellLeft + cell / 2;
+  // 角色总高占 cell 92%,留 4% padding 上下
+  const totalH = cell * 0.92;
+  const top = cellTop + cell * 0.04;          // 头顶 y,严格在格子内
+  const bottom = top + totalH;
+  // 总宽不超过 cell × 0.62(给抖动线留余地)
+  const totalW = cell * 0.62;
 
-  // 整体高度占格子 90%,宽度占 65%
-  const totalH = cell * 0.88;
-  const bodyW = cell * 0.55;
-  const headR = totalH * 0.30;          // 头大约 1/3 总高
-  const bodyH = totalH * 0.35;          // 躯干
-  const legH = totalH * 0.25;           // 腿
-  const top = cy - totalH / 2;          // 头顶 y
-  const headCy = top + headR;
+  // 头大约占总高 38%(3 头身比例)
+  const headH = totalH * 0.40;
+  const headR = headH * 0.50;
+  const headCy = top + headR + headH * 0.05;
+  // 躯干 30%
+  const bodyH = totalH * 0.30;
   const bodyTop = headCy + headR * 0.85;
+  const bodyW = totalW * 0.70;
+  // 腿 + 鞋 30%
+  const legZoneH = bottom - (bodyTop + bodyH);
+  const legH = legZoneH * 0.65;
+  const shoeH = legZoneH * 0.35;
   const legTop = bodyTop + bodyH;
+  const shoeTop = legTop + legH;
 
-  // 整体抖动小线条(围绕角色,体现"主角光环")
+  // ----- 抖动线(收紧,确保不超出格子)-----
   ctx.strokeStyle = COLORS.action;
   ctx.lineWidth = 1.5;
   ctx.lineCap = 'round';
-  const wobble = [
-    { x1: cx - cell * 0.45, y1: cy - cell * 0.05, x2: cx - cell * 0.5, y2: cy - cell * 0.1 },
-    { x1: cx + cell * 0.45, y1: cy - cell * 0.05, x2: cx + cell * 0.5, y2: cy - cell * 0.1 },
-    { x1: cx + cell * 0.42, y1: cy + cell * 0.15, x2: cx + cell * 0.48, y2: cy + cell * 0.2 }
+  // 只画 3 条小斜线,完全在 cell × 0.85 内
+  const wobbleR = totalW * 0.55; // 距 cx 的距离上限
+  const wobbles = [
+    { x1: cx - wobbleR * 0.95, y1: headCy - headR * 0.3, x2: cx - wobbleR * 1.05, y2: headCy - headR * 0.5 },
+    { x1: cx + wobbleR * 0.95, y1: headCy - headR * 0.3, x2: cx + wobbleR * 1.05, y2: headCy - headR * 0.5 },
+    { x1: cx + wobbleR * 0.85, y1: bodyTop + bodyH * 0.5, x2: cx + wobbleR * 1.0, y2: bodyTop + bodyH * 0.7 }
   ];
-  wobble.forEach(w => {
+  // 边界检查:超出 cell 就不画
+  wobbles.forEach(w => {
+    if (Math.max(w.x1, w.x2) > cellLeft + cell - 2) return;
+    if (Math.min(w.x1, w.x2) < cellLeft + 2) return;
     ctx.beginPath();
     ctx.moveTo(w.x1, w.y1);
     ctx.lineTo(w.x2, w.y2);
     ctx.stroke();
   });
 
-  // ----- 腿 -----
-  const legW = bodyW * 0.32;
-  // 左腿(蓝裤)
-  strokedRoundRect(ctx, cx - bodyW * 0.32 - legW / 2, legTop, legW, legH * 0.7, 4, COLORS.pants, 2.5);
-  // 右腿
-  strokedRoundRect(ctx, cx + bodyW * 0.32 - legW / 2, legTop, legW, legH * 0.7, 4, COLORS.pants, 2.5);
-  // 鞋(白)
-  const shoeW = legW * 1.1;
-  strokedRoundRect(ctx, cx - bodyW * 0.32 - shoeW / 2, legTop + legH * 0.7, shoeW, legH * 0.3, 3, '#FFFFFF', 2.5);
-  strokedRoundRect(ctx, cx + bodyW * 0.32 - shoeW / 2, legTop + legH * 0.7, shoeW, legH * 0.3, 3, '#FFFFFF', 2.5);
+  // ----- 腿(蓝裤)-----
+  const legW = bodyW * 0.30;
+  strokedRoundRect(ctx, cx - bodyW * 0.30 - legW / 2, legTop, legW, legH, 3, COLORS.pants, 2);
+  strokedRoundRect(ctx, cx + bodyW * 0.30 - legW / 2, legTop, legW, legH, 3, COLORS.pants, 2);
+
+  // ----- 鞋(白色,稍宽)-----
+  const shoeW = legW * 1.15;
+  strokedRoundRect(ctx, cx - bodyW * 0.30 - shoeW / 2, shoeTop, shoeW, shoeH, 3, '#FFFFFF', 2);
+  strokedRoundRect(ctx, cx + bodyW * 0.30 - shoeW / 2, shoeTop, shoeW, shoeH, 3, '#FFFFFF', 2);
 
   // ----- 躯干(白T)-----
-  strokedRoundRect(ctx, cx - bodyW / 2, bodyTop, bodyW, bodyH, 8, COLORS.shirt, 3);
+  strokedRoundRect(ctx, cx - bodyW / 2, bodyTop, bodyW, bodyH, 5, COLORS.shirt, 2.5);
 
-  // ----- 手臂(肤色)-----
-  const armW = bodyW * 0.18;
-  const armH = bodyH * 0.7;
-  // 左臂
-  strokedRoundRect(ctx, cx - bodyW / 2 - armW * 0.7, bodyTop + 4, armW, armH, 4, COLORS.skin, 2.5);
-  // 右臂
-  strokedRoundRect(ctx, cx + bodyW / 2 - armW * 0.3, bodyTop + 4, armW, armH, 4, COLORS.skin, 2.5);
+  // ----- 手臂(肤色),收紧紧贴躯干两侧 -----
+  const armW = bodyW * 0.16;
+  const armH = bodyH * 0.65;
+  strokedRoundRect(ctx, cx - bodyW / 2 - armW * 0.5, bodyTop + 2, armW, armH, 3, COLORS.skin, 2);
+  strokedRoundRect(ctx, cx + bodyW / 2 - armW * 0.5, bodyTop + 2, armW, armH, 3, COLORS.skin, 2);
 
   // ----- 头(肤色圆)-----
-  strokedCircle(ctx, cx, headCy, headR, COLORS.skin, 3);
+  strokedCircle(ctx, cx, headCy, headR, COLORS.skin, 2.5);
 
-  // ----- 黑色短发(头顶后方)-----
+  // ----- 黑色短发 -----
   ctx.fillStyle = COLORS.ink;
   ctx.beginPath();
-  // 用一个稍宽的椭圆+裁切,做短发效果
-  ctx.ellipse(cx, headCy - headR * 0.15, headR * 1.05, headR * 0.7, 0, Math.PI, 0);
+  ctx.ellipse(cx, headCy - headR * 0.10, headR * 1.0, headR * 0.65, 0, Math.PI, 0);
   ctx.fill();
 
   // ----- 白色棒球鸭舌帽 -----
-  // 帽冠(半圆)
+  // 帽冠(半圆,严格在头宽内)
   ctx.fillStyle = '#FFFFFF';
   ctx.strokeStyle = COLORS.ink;
-  ctx.lineWidth = 3;
+  ctx.lineWidth = 2.5;
   ctx.beginPath();
-  ctx.ellipse(cx, headCy - headR * 0.55, headR * 1.0, headR * 0.55, 0, Math.PI, 0);
+  ctx.ellipse(cx, headCy - headR * 0.50, headR * 0.95, headR * 0.50, 0, Math.PI, 0);
   ctx.fill();
   ctx.stroke();
 
-  // 帽舌(向前的小梯形)
+  // 帽舌(向前小梯形,**收紧**:从 1.3 改成 1.0,完全在格子内)
   ctx.fillStyle = '#FFFFFF';
   ctx.beginPath();
-  ctx.moveTo(cx + headR * 0.3, headCy - headR * 0.2);
-  ctx.lineTo(cx + headR * 1.3, headCy - headR * 0.05);
-  ctx.lineTo(cx + headR * 1.3, headCy + headR * 0.1);
-  ctx.lineTo(cx + headR * 0.3, headCy + headR * 0.0);
+  ctx.moveTo(cx + headR * 0.20, headCy - headR * 0.18);
+  ctx.lineTo(cx + headR * 1.0,  headCy - headR * 0.05);
+  ctx.lineTo(cx + headR * 1.0,  headCy + headR * 0.08);
+  ctx.lineTo(cx + headR * 0.20, headCy + headR * 0.0);
   ctx.closePath();
   ctx.fill();
   ctx.strokeStyle = COLORS.ink;
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 2;
   ctx.stroke();
 
-  // 帽前粉色心(身份标识)
+  // 帽前粉色心
   ctx.fillStyle = COLORS.cheek;
+  const heartCy = headCy - headR * 0.50;
+  const heartSize = headR * 0.20;
   ctx.beginPath();
-  const heartCx = cx;
-  const heartCy = headCy - headR * 0.55;
-  const heartSize = headR * 0.22;
-  // 简化版心形:两个圆 + 三角
-  ctx.arc(heartCx - heartSize * 0.4, heartCy - heartSize * 0.1, heartSize * 0.5, 0, Math.PI * 2);
+  ctx.arc(cx - heartSize * 0.4, heartCy - heartSize * 0.1, heartSize * 0.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.arc(heartCx + heartSize * 0.4, heartCy - heartSize * 0.1, heartSize * 0.5, 0, Math.PI * 2);
+  ctx.arc(cx + heartSize * 0.4, heartCy - heartSize * 0.1, heartSize * 0.5, 0, Math.PI * 2);
   ctx.fill();
   ctx.beginPath();
-  ctx.moveTo(heartCx - heartSize * 0.85, heartCy);
-  ctx.lineTo(heartCx + heartSize * 0.85, heartCy);
-  ctx.lineTo(heartCx, heartCy + heartSize * 0.7);
+  ctx.moveTo(cx - heartSize * 0.85, heartCy);
+  ctx.lineTo(cx + heartSize * 0.85, heartCy);
+  ctx.lineTo(cx, heartCy + heartSize * 0.7);
   ctx.closePath();
   ctx.fill();
 
   // ----- 脸部 -----
-  // 两只大眼睛(椭圆)
+  // 两只大眼睛
   ctx.fillStyle = COLORS.ink;
   ctx.beginPath();
   ctx.ellipse(cx - headR * 0.32, headCy + headR * 0.10, headR * 0.10, headR * 0.14, 0, 0, Math.PI * 2);
   ctx.ellipse(cx + headR * 0.32, headCy + headR * 0.10, headR * 0.10, headR * 0.14, 0, 0, Math.PI * 2);
   ctx.fill();
-
   // 眼睛高光
   ctx.fillStyle = '#FFFFFF';
   ctx.beginPath();
-  ctx.arc(cx - headR * 0.30, headCy + headR * 0.05, headR * 0.04, 0, Math.PI * 2);
-  ctx.arc(cx + headR * 0.34, headCy + headR * 0.05, headR * 0.04, 0, Math.PI * 2);
+  ctx.arc(cx - headR * 0.30, headCy + headR * 0.06, headR * 0.04, 0, Math.PI * 2);
+  ctx.arc(cx + headR * 0.34, headCy + headR * 0.06, headR * 0.04, 0, Math.PI * 2);
   ctx.fill();
 
-  // 微笑曲线
+  // 微笑
   ctx.strokeStyle = COLORS.ink;
-  ctx.lineWidth = 2.5;
+  ctx.lineWidth = 2;
   ctx.lineCap = 'round';
   ctx.beginPath();
-  ctx.arc(cx, headCy + headR * 0.32, headR * 0.20, 0.18 * Math.PI, 0.82 * Math.PI);
+  ctx.arc(cx, headCy + headR * 0.30, headR * 0.18, 0.18 * Math.PI, 0.82 * Math.PI);
   ctx.stroke();
 
-  // 两个粉腮红
+  // 腮红(向脸内收一点,不超出脸轮廓)
   ctx.fillStyle = COLORS.cheek;
   ctx.globalAlpha = 0.55;
   ctx.beginPath();
-  ctx.arc(cx - headR * 0.55, headCy + headR * 0.30, headR * 0.13, 0, Math.PI * 2);
-  ctx.arc(cx + headR * 0.55, headCy + headR * 0.30, headR * 0.13, 0, Math.PI * 2);
+  ctx.arc(cx - headR * 0.50, headCy + headR * 0.28, headR * 0.12, 0, Math.PI * 2);
+  ctx.arc(cx + headR * 0.50, headCy + headR * 0.28, headR * 0.12, 0, Math.PI * 2);
   ctx.fill();
   ctx.globalAlpha = 1;
 }
