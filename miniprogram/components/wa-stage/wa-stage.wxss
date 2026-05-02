@@ -179,6 +179,49 @@
   background: #FFE9B8;
   opacity: 0.55;
 }
+
+/* C3 镜子被玩家走入视野:朱砂橙发光 + 抖动 + 顶部眼睛图标 */
+.shelf--watching {
+  border-color: #FF6B47;
+  background: #FFE9B8;
+  animation: mirror-watch 400ms ease-out 3;
+}
+@keyframes mirror-watch {
+  0%, 100% { transform: translate(0, 0); }
+  25%      { transform: translate(-3rpx, 0); }
+  50%      { transform: translate(0, -2rpx); }
+  75%      { transform: translate(3rpx, 0); }
+}
+.shelf-watch-eye {
+  position: absolute;
+  top: -16rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 22rpx;
+  background: #FF6B47;
+  color: #FFFFFF;
+  padding: 1rpx 6rpx;
+  border-radius: 10rpx;
+  border: 2rpx solid #2C2C2A;
+  white-space: nowrap;
+}
+
+/* C3 镜子被打碎:灰色 + 倾斜 + 透明度低 */
+.shelf--broken {
+  background: #D5D8DC;
+  border-color: #888780;
+  border-style: dotted;
+  transform: rotate(-6deg);
+  opacity: 0.7;
+}
+.shelf--broken .shelf-emoji {
+  color: #888780;
+}
+.shelf--broken .shelf-label {
+  color: #888780;
+  text-decoration: line-through;
+}
+
 .shelf-badge {
   position: absolute;
   top: -8rpx;

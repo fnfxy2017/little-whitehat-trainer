@@ -17,7 +17,8 @@ const CARD_ICON = {
   water: '💧', water_drop: '💧',
   repeat: '🔁', repeat_loop: '🔁',
   buy: '🛒', buy_milk: '🥛', buy_icecream: '🍦',
-  buy_bread: '🍞', buy_apple: '🍎'
+  buy_bread: '🍞', buy_apple: '🍎',
+  break_mirror: '💢'
 };
 
 Page({

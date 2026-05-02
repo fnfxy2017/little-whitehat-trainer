@@ -224,21 +224,37 @@ Component({
         });
       }
 
-      // 货架 (C1 等)
+      // 货架 (C1 等)+ 镜子视野(C3)
       const shelves = [];
       this._shelves = {};
+      this._mirrors = {};  // C3:{ id: { x, y, broken, watchTiles: [[x,y],...] } }
       for (const id of Object.keys(level.shelves || {})) {
         const s = level.shelves[id];
         this._shelves[id] = {
-          id: id, x: s.x, y: s.y, sprite: s.sprite, trap: !!s.trap
+          id: id, x: s.x, y: s.y, sprite: s.sprite, trap: !!s.trap,
+          propType: s.propType || s.sprite
         };
         shelves.push({
           id: id, x: s.x, y: s.y,
           sprite: s.sprite,
           trap: !!s.trap,
           label: SHELF_LABELS[s.sprite] || s.sprite,
-          emoji: SHELF_EMOJI[s.sprite] || '📦'
+          emoji: SHELF_EMOJI[s.sprite] || '📦',
+          broken: false
         });
+        // 镜子的视野:左右各 1 格 + 正前方 1 格(假设朝上,即 y-1)
+        // 这样直走 (5,3) 在视野内,绕到 (5,5) 在视野外
+        if (s.propType === 'mirror' || s.sprite === 'mirror') {
+          this._mirrors[id] = {
+            id: id, x: s.x, y: s.y, broken: false,
+            watchTiles: [
+              [s.x, s.y],         // 镜子位置本身
+              [s.x - 1, s.y],     // 左边一格
+              [s.x + 1, s.y],     // 右边一格
+              [s.x, s.y - 1]      // 正前方一格(假设朝上)
+            ]
+          };
+        }
       }
 
       // 目标
@@ -285,6 +301,7 @@ Component({
 
       this._holding = null;
       this._purchased = {};
+      this._eavesdropped = false;  // C3:走入镜子视野则置 true
       this._stepCount = 0;
     },
 
@@ -382,6 +399,10 @@ Component({
           self._executeBuy(card.item || card.sprite, resolve);
           return;
         }
+        if (action === 'break_mirror') {
+          self._executeBreakMirror(resolve);
+          return;
+        }
         console.warn('[wa-stage] 未支持的 action:', action);
         resolve();
       });
@@ -391,30 +412,60 @@ Component({
       const DIR_VEC = { up:{dx:0,dy:-1}, down:{dx:0,dy:1}, left:{dx:-1,dy:0}, right:{dx:1,dy:0} };
       const v = DIR_VEC[dir];
       if (!v) { resolve(); return; }
+      const self = this;
       let i = 0;
-      const stepOne = () => {
+      const stepOne = function () {
         if (i >= steps) { resolve(); return; }
-        const nx = this.data.playerX + v.dx;
-        const ny = this.data.playerY + v.dy;
-        if (!this._isWalkable(nx, ny)) {
-          // 撞墙:不动,继续下一步
+        const nx = self.data.playerX + v.dx;
+        const ny = self.data.playerY + v.dy;
+        if (!self._isWalkable(nx, ny)) {
           i++;
           setTimeout(stepOne, 80);
           return;
         }
-        // 移动到新位置
         const updates = { playerX: nx, playerY: ny };
-        // 手持物品跟着走
-        if (this._holding) {
-          this._items[this._holding].x = nx;
-          this._items[this._holding].y = ny;
+        if (self._holding) {
+          self._items[self._holding].x = nx;
+          self._items[self._holding].y = ny;
         }
-        this.setData(updates);
+        self.setData(updates);
         i++;
-        this._stepCount++;
-        setTimeout(stepOne, this.data.stepDuration);
+        self._stepCount++;
+
+        // 检查镜子视野(C3 中间人攻击)
+        self._checkMirrorWatch(nx, ny);
+
+        setTimeout(stepOne, self.data.stepDuration);
       };
       stepOne();
+    },
+
+    /**
+     * 检查玩家当前位置是否进入未碎镜子的视野
+     * 若进入 → 置 _eavesdropped=true + 触发"被监听"视觉反馈
+     */
+    _checkMirrorWatch(px, py) {
+      const ids = Object.keys(this._mirrors || {});
+      for (let i = 0; i < ids.length; i++) {
+        const m = this._mirrors[ids[i]];
+        if (m.broken) continue;
+        for (let j = 0; j < m.watchTiles.length; j++) {
+          const t = m.watchTiles[j];
+          if (t[0] === px && t[1] === py) {
+            if (!this._eavesdropped) {
+              this._eavesdropped = true;
+              // 视觉反馈:对应镜子项加 watching 状态闪一下
+              const shelves = this.data.shelves.map(function (sh) {
+                if (sh.id !== m.id) return sh;
+                return Object.assign({}, sh, { watching: true });
+              });
+              this.setData({ shelves: shelves });
+              wx.vibrateShort && wx.vibrateShort({ type: 'heavy' });
+            }
+            return;
+          }
+        }
+      }
     },
 
     _executePickup() {
@@ -622,6 +673,44 @@ Component({
     },
 
     /**
+     * 打碎镜子 · C3 用 · 找附近(同格 + 4 邻)的未碎镜子
+     * 标记 broken,视野失效
+     */
+    _executeBreakMirror(resolve) {
+      const self = this;
+      const px = this.data.playerX, py = this.data.playerY;
+      const cands = [[px, py], [px+1, py], [px-1, py], [px, py+1], [px, py-1]];
+      let id = null;
+      const ids = Object.keys(this._mirrors || {});
+      for (let i = 0; i < cands.length && !id; i++) {
+        const cx = cands[i][0], cy = cands[i][1];
+        for (let j = 0; j < ids.length; j++) {
+          const m = this._mirrors[ids[j]];
+          if (m.broken) continue;
+          if (m.x === cx && m.y === cy) { id = ids[j]; break; }
+        }
+      }
+      if (!id) {
+        // 附近没未碎镜子 — 空转
+        wx.vibrateShort && wx.vibrateShort({ type: 'light' });
+        setTimeout(resolve, 200);
+        return;
+      }
+
+      this._mirrors[id].broken = true;
+      // 视觉:对应 shelf 项加 broken,停掉 watching
+      const shelves = this.data.shelves.map(function (sh) {
+        if (sh.id !== id) return sh;
+        return Object.assign({}, sh, { broken: true, watching: false });
+      });
+      this.setData({ shelves: shelves });
+      wx.vibrateShort && wx.vibrateShort({ type: 'heavy' });
+
+      // 500ms 后回调,给一点视觉停留
+      setTimeout(resolve, 500);
+    },
+
+    /**
      * 父级调用,检查通关条件
      */
     isComplete() {
@@ -630,7 +719,10 @@ Component({
 
       if (cond.type === 'reach_goal') {
         if (!lv.goal) return false;
-        return this.data.playerX === lv.goal.x && this.data.playerY === lv.goal.y;
+        if (this.data.playerX !== lv.goal.x || this.data.playerY !== lv.goal.y) return false;
+        // C3:被镜子监听过则不算通关
+        if (this._eavesdropped) return false;
+        return true;
       }
 
       if (cond.type === 'reach_credential_door') {
