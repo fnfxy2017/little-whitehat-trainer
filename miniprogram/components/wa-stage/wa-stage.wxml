@@ -74,6 +74,15 @@
     <view wx:if="{{n.isGuard && !n.asided}}" class="guard-badge">🛡</view>
   </view>
 
+  <!-- 6a. 守卫警戒线(整列,未让开时) -->
+  <block wx:for="{{npcs}}" wx:for-item="n" wx:key="id">
+    <view
+      wx:if="{{n.isGuard && !n.asided}}"
+      class="guard-block-line"
+      style="left: {{n.x * cellSize}}px; top: 0; width: {{cellSize}}px; height: {{stageH}}px;"
+    ></view>
+  </block>
+
   <!-- 6b. 守卫拦截气泡(C4) -->
   <view
     wx:if="{{guardBubble}}"

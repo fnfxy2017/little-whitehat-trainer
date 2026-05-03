@@ -329,7 +329,8 @@ Component({
      * - 墙永远阻挡
      * - 家具默认可走
      * - credential_door:未解锁时阻挡
-     * - 守卫(role=guard):未让开时阻挡
+     * - 守卫(role=guard):未让开时,阻挡整列(x=guard.x),
+     *   让开后只占新位置一格(由 npc 渲染层自然挡住自己那格)
      */
     _isWalkable(x, y) {
       if (x < 0 || y < 0 || x >= this._gridW || y >= this._gridH) return false;
@@ -338,12 +339,16 @@ Component({
       if (goal && goal.kind === 'cred-door' && goal.x === x && goal.y === y) {
         return !!goal.unlocked;
       }
-      // 守卫拦截 — 没让开就挡路
+      // 守卫拦截 — 未让开则挡整列(挡住绕路);让开后让出原列只占新位置
       const gids = Object.keys(this._guards || {});
       for (let i = 0; i < gids.length; i++) {
         const g = this._guards[gids[i]];
-        if (g.asided) continue;
-        if (g.x === x && g.y === y) return false;
+        if (!g.asided) {
+          if (g.x === x) return false;  // 同列任何格都挡
+        } else {
+          // 让开后只挡当前所在格(防玩家直接进守卫脚下)
+          if (g.x === x && g.y === y) return false;
+        }
       }
       return true;
     },
@@ -473,21 +478,20 @@ Component({
     },
 
     /**
-     * 撞到目标格如果是未让开的守卫,弹他的拦截话
+     * 撞到目标格如果是未让开守卫的整列,弹他的拦截话
      */
     _showGuardBlockIfAny(tx, ty) {
       const gids = Object.keys(this._guards || {});
       for (let i = 0; i < gids.length; i++) {
         const g = this._guards[gids[i]];
         if (g.asided) continue;
-        if (g.x === tx && g.y === ty) {
-          // 找到拦截的守卫
+        // 同列任意格都触发(不只是守卫脚下那格)
+        if (g.x === tx) {
           const msg = g.blockMessage || '站住!';
           this.setData({
             guardBubble: { id: g.id, x: g.x, y: g.y, text: msg, key: 'gb-' + Date.now() }
           });
           wx.vibrateShort && wx.vibrateShort({ type: 'medium' });
-          // 1.5s 后清除气泡
           const self = this;
           if (this._guardBubbleTimer) clearTimeout(this._guardBubbleTimer);
           this._guardBubbleTimer = setTimeout(function () {
