@@ -151,6 +151,91 @@
 .npc-wrap {
   position: absolute;
   z-index: 6;
+  transition: left 350ms ease-out, top 350ms ease-out;
+}
+
+/* 守卫:加金属环外框提示"挡路状态" */
+.npc-wrap--guard::before {
+  content: '';
+  position: absolute;
+  inset: 4rpx;
+  border: 3rpx solid #FF6B47;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  animation: guard-pulse 1.4s ease-in-out infinite;
+}
+@keyframes guard-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.06); }
+}
+
+/* 让开后:停止脉冲 + 透明度低一点 */
+.npc-wrap--asided::before {
+  display: none;
+}
+.npc-wrap--asided {
+  opacity: 0.7;
+}
+
+.guard-badge {
+  position: absolute;
+  top: -12rpx;
+  right: -8rpx;
+  background: #FF6B47;
+  color: #FFFFFF;
+  font-size: 22rpx;
+  width: 32rpx;
+  height: 32rpx;
+  line-height: 28rpx;
+  text-align: center;
+  border-radius: 50%;
+  border: 3rpx solid #2C2C2A;
+  z-index: 10;
+}
+
+/* 守卫拦截气泡 */
+.guard-bubble {
+  position: absolute;
+  z-index: 30;
+  /* 气泡显示在守卫上方 */
+  transform: translate(-25%, -90%);
+  pointer-events: none;
+  animation: guard-bubble-pop 200ms ease-out;
+}
+@keyframes guard-bubble-pop {
+  0%   { transform: translate(-25%, -70%) scale(0.6); opacity: 0; }
+  100% { transform: translate(-25%, -90%) scale(1);   opacity: 1; }
+}
+.guard-bubble-text {
+  background: #FFFCF2;
+  border: 3rpx solid #2C2C2A;
+  border-radius: 16rpx;
+  box-shadow: 3rpx 3rpx 0 0 #2C2C2A;
+  padding: 8rpx 14rpx;
+  font-size: 22rpx;
+  font-weight: 800;
+  color: #2C2C2A;
+  white-space: nowrap;
+}
+.guard-bubble-tail {
+  position: absolute;
+  bottom: -10rpx;
+  left: 30%;
+  width: 0; height: 0;
+  border-left: 8rpx solid transparent;
+  border-right: 8rpx solid transparent;
+  border-top: 12rpx solid #2C2C2A;
+}
+.guard-bubble-tail::after {
+  content: '';
+  position: absolute;
+  top: -13rpx;
+  left: -6rpx;
+  width: 0; height: 0;
+  border-left: 6rpx solid transparent;
+  border-right: 6rpx solid transparent;
+  border-top: 9rpx solid #FFFCF2;
 }
 
 /* ============ 7c. 货架(C1) ============ */

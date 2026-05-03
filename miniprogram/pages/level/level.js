@@ -18,7 +18,8 @@ const CARD_ICON = {
   repeat: '🔁', repeat_loop: '🔁',
   buy: '🛒', buy_milk: '🥛', buy_icecream: '🍦',
   buy_bread: '🍞', buy_apple: '🍎',
-  break_mirror: '💢'
+  break_mirror: '💢',
+  social_engineer: '🎭'
 };
 
 Page({

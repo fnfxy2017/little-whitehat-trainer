@@ -58,7 +58,7 @@
     wx:for="{{npcs}}"
     wx:for-item="n"
     wx:key="id"
-    class="npc-wrap"
+    class="npc-wrap {{n.isGuard ? 'npc-wrap--guard' : ''}} {{n.asided ? 'npc-wrap--asided' : ''}}"
     style="left: {{n.x * cellSize}}px; top: {{n.y * cellSize}}px; width: {{cellSize}}px; height: {{cellSize}}px;"
   >
     <blake-sprite wx:if="{{n.type === 'blake'}}" size="{{cellSize}}" />
@@ -71,6 +71,17 @@
       mood="{{n.profile.mood}}"
       showBlush="{{n.profile.showBlush}}"
     />
+    <view wx:if="{{n.isGuard && !n.asided}}" class="guard-badge">🛡</view>
+  </view>
+
+  <!-- 6b. 守卫拦截气泡(C4) -->
+  <view
+    wx:if="{{guardBubble}}"
+    class="guard-bubble"
+    style="left: {{guardBubble.x * cellSize}}px; top: {{guardBubble.y * cellSize}}px;"
+  >
+    <view class="guard-bubble-text">{{guardBubble.text}}</view>
+    <view class="guard-bubble-tail"></view>
   </view>
 
   <!-- 7. 物品(地上)— 凭证特殊样式 -->

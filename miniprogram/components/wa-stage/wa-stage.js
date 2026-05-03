@@ -66,10 +66,11 @@ Component({
     groundItems: [],
     colorables: [],
     flowers: [],
-    shelves: [],     // C1 等:[{ id, sprite, x, y, trap }]
+    shelves: [],
     goal: null,
     takingItem: null,
     wateringEffect: null,
+    guardBubble: null,  // C4:守卫拦截/放行气泡 { id, x, y, text, key }
 
     celebrating: false
   },
@@ -118,6 +119,7 @@ Component({
      * 根据 levelData 初始化所有渲染数据
      */
     _setupLevel(level) {
+      const self = this;
       this._initSize();
 
       const size = level.map.size;
@@ -167,10 +169,26 @@ Component({
         else furniture.push(item);
       });
 
+      // NPCs + 守卫(C4 等)
+      this._guards = {};  // id → { x, y, asidePos, acceptPersona, asided }
       const npcs = (level.npcs || []).map(function (n) {
+        const isGuard = n.role === 'guard';
+        if (isGuard) {
+          self._guards[n.id] = {
+            id: n.id,
+            x: n.x, y: n.y,
+            asidePos: n.asidePos,
+            acceptPersona: n.acceptPersona,
+            blockMessage: n.blockMessage,
+            asided: false
+          };
+        }
         return {
           id: n.id, type: n.type,
           x: n.x, y: n.y,
+          role: n.role,
+          isGuard: isGuard,
+          asided: false,
           profile: npcCatalog.getNpcProfile(n.type)
         };
       });
@@ -296,6 +314,7 @@ Component({
         heldItemIcon: '',
         heldItemSprite: '',
         wateringEffect: null,
+        guardBubble: null,
         celebrating: false
       });
 
@@ -309,15 +328,22 @@ Component({
      * 检查格子是否可走
      * - 墙永远阻挡
      * - 家具默认可走
-     * - credential_door:未解锁时阻挡(没拿对应凭证),解锁后通过
+     * - credential_door:未解锁时阻挡
+     * - 守卫(role=guard):未让开时阻挡
      */
     _isWalkable(x, y) {
       if (x < 0 || y < 0 || x >= this._gridW || y >= this._gridH) return false;
       if (this._wallSet.has(x + ',' + y)) return false;
-      // 凭证门检查
       const goal = this.data.goal;
       if (goal && goal.kind === 'cred-door' && goal.x === x && goal.y === y) {
         return !!goal.unlocked;
+      }
+      // 守卫拦截 — 没让开就挡路
+      const gids = Object.keys(this._guards || {});
+      for (let i = 0; i < gids.length; i++) {
+        const g = this._guards[gids[i]];
+        if (g.asided) continue;
+        if (g.x === x && g.y === y) return false;
       }
       return true;
     },
@@ -403,6 +429,10 @@ Component({
           self._executeBreakMirror(resolve);
           return;
         }
+        if (action === 'social_engineer') {
+          self._executeSocialEngineer(card.persona, resolve);
+          return;
+        }
         console.warn('[wa-stage] 未支持的 action:', action);
         resolve();
       });
@@ -419,6 +449,8 @@ Component({
         const nx = self.data.playerX + v.dx;
         const ny = self.data.playerY + v.dy;
         if (!self._isWalkable(nx, ny)) {
+          // 撞到守卫:显示拦截气泡
+          self._showGuardBlockIfAny(nx, ny);
           i++;
           setTimeout(stepOne, 80);
           return;
@@ -438,6 +470,32 @@ Component({
         setTimeout(stepOne, self.data.stepDuration);
       };
       stepOne();
+    },
+
+    /**
+     * 撞到目标格如果是未让开的守卫,弹他的拦截话
+     */
+    _showGuardBlockIfAny(tx, ty) {
+      const gids = Object.keys(this._guards || {});
+      for (let i = 0; i < gids.length; i++) {
+        const g = this._guards[gids[i]];
+        if (g.asided) continue;
+        if (g.x === tx && g.y === ty) {
+          // 找到拦截的守卫
+          const msg = g.blockMessage || '站住!';
+          this.setData({
+            guardBubble: { id: g.id, x: g.x, y: g.y, text: msg, key: 'gb-' + Date.now() }
+          });
+          wx.vibrateShort && wx.vibrateShort({ type: 'medium' });
+          // 1.5s 后清除气泡
+          const self = this;
+          if (this._guardBubbleTimer) clearTimeout(this._guardBubbleTimer);
+          this._guardBubbleTimer = setTimeout(function () {
+            self.setData({ guardBubble: null });
+          }, 1500);
+          return;
+        }
+      }
     },
 
     /**
@@ -711,6 +769,76 @@ Component({
 
       // 500ms 后回调,给一点视觉停留
       setTimeout(resolve, 500);
+    },
+
+    /**
+     * 假扮某身份(C4 社会工程学)· 找附近未让开的守卫,
+     * 如果 acceptPersona 匹配(或 null=接受任何身份)→ 守卫让开到 asidePos
+     */
+    _executeSocialEngineer(persona, resolve) {
+      const self = this;
+      const px = this.data.playerX, py = this.data.playerY;
+      const cands = [[px, py], [px+1, py], [px-1, py], [px, py+1], [px, py-1]];
+      let id = null;
+      const ids = Object.keys(this._guards || {});
+      for (let i = 0; i < cands.length && !id; i++) {
+        const cx = cands[i][0], cy = cands[i][1];
+        for (let j = 0; j < ids.length; j++) {
+          const g = this._guards[ids[j]];
+          if (g.asided) continue;
+          if (g.x === cx && g.y === cy) { id = ids[j]; break; }
+        }
+      }
+      if (!id) {
+        // 附近没未让开的守卫 — 空转
+        wx.vibrateShort && wx.vibrateShort({ type: 'light' });
+        setTimeout(resolve, 200);
+        return;
+      }
+
+      const g = this._guards[id];
+      // 检查 persona 是否匹配(C4 守卫 acceptPersona=null,接受任意身份)
+      const accepts = !g.acceptPersona || g.acceptPersona === persona;
+      if (!accepts) {
+        // 不接受 → 守卫拒绝
+        this.setData({
+          guardBubble: { id: g.id, x: g.x, y: g.y, text: '我不认识!', key: 'gb-' + Date.now() }
+        });
+        wx.vibrateShort && wx.vibrateShort({ type: 'medium' });
+        const stTimer = setTimeout(function () { self.setData({ guardBubble: null }); }, 1500);
+        if (this._guardBubbleTimer) clearTimeout(this._guardBubbleTimer);
+        this._guardBubbleTimer = stTimer;
+        setTimeout(resolve, 600);
+        return;
+      }
+
+      // 接受身份 → 守卫让开,显示放行气泡
+      this.setData({
+        guardBubble: { id: g.id, x: g.x, y: g.y, text: '是' + (persona || '') + '啊,请进', key: 'gb-' + Date.now() }
+      });
+      wx.vibrateShort && wx.vibrateShort({ type: 'medium' });
+
+      // 600ms 后:守卫真正让开 + 1500ms 后清气泡
+      setTimeout(function () {
+        const aside = g.asidePos;
+        if (aside) {
+          self._guards[id].x = aside[0];
+          self._guards[id].y = aside[1];
+        }
+        self._guards[id].asided = true;
+        // 同步更新 data.npcs(渲染层位置 + asided 状态)
+        const npcs = self.data.npcs.map(function (n) {
+          if (n.id !== id) return n;
+          return Object.assign({}, n,
+            aside ? { x: aside[0], y: aside[1], asided: true } : { asided: true }
+          );
+        });
+        self.setData({ npcs: npcs });
+      }, 600);
+
+      if (this._guardBubbleTimer) clearTimeout(this._guardBubbleTimer);
+      this._guardBubbleTimer = setTimeout(function () { self.setData({ guardBubble: null }); }, 1500);
+      setTimeout(resolve, 900);
     },
 
     /**

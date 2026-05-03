@@ -117,11 +117,15 @@ function adapt(raw) {
     npcs.push({
       id: e.id,
       type: e.type,
-      role: e.role || null,        // follower 等
+      role: e.role || null,
       follows: e.follows || null,
       label: e.label || '',
       x: e.pos ? e.pos[0] : 0,
-      y: e.pos ? e.pos[1] : 0
+      y: e.pos ? e.pos[1] : 0,
+      // 守卫专用字段(C4 等)
+      asidePos: e.aside_pos || null,        // 让开后的位置
+      blockMessage: e.block_message || '',  // 拦截话
+      acceptPersona: e.accept_persona || null  // 信任的身份(默认接受任何 persona)
     });
   }
 
@@ -135,7 +139,9 @@ function adapt(raw) {
     color: c.color,
     stepsInput: c.steps_input || false,
     timesInput: c.times_input || false,
-    isContainer: c.is_container || false
+    isContainer: c.is_container || false,
+    persona: c.persona || null,
+    item: c.item || null
   }));
 
   return {
